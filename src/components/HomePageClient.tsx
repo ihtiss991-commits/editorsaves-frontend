@@ -698,7 +698,7 @@ const HOME_HTML = String.raw`<!-- ============================================
                     <span class="faq-toggle"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
                 </button>
                 <div class="faq-answer">
-                    <p>We support over 50 save formats including RPG Maker MV (.rpgsave), RPG Maker MZ (.rmmzsave), RPG Maker VX Ace (.rvdata2), RPG Maker XP (.rxdata), Ren'Py (.save), Unity (PlayerPrefs, JSON, XML, .es3), Unreal Engine (.sav), SQLite (.db, .sqlite), Python Pickle (.pkl), Ruby Marshal, JSON, XML, MessagePack, CBOR, Protocol Buffers, plist, and many more.</p>
+                    <p>We are building support for 23+ save formats including RPG Maker MV, MZ, VX Ace, XP, Ren'Py, Unity, Unreal Engine, SQLite, Python Pickle, Ruby Marshal, JSON, XML, MessagePack, CBOR, Protocol Buffers, plist, and many more.</p>
                 </div>
             </div>
 
@@ -1288,7 +1288,7 @@ export default function HomePageClient() {
             "@id": "https://editorsaves.com/#faq",
             "mainEntity": [
                 {"@type": "Question", "name": "Is EditorSaves really free?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, EditorSaves is completely free to use — forever. There are no subscriptions, hidden fees, premium tiers, or credit card requirements. Every feature is available to every user from the moment they land on the site."}},
-                {"@type": "Question", "name": "What save formats does EditorSaves support?", "acceptedAnswer": {"@type": "Answer", "text": "We support over 50 save formats including RPG Maker MV (.rpgsave), RPG Maker MZ (.rmmzsave), RPG Maker VX Ace (.rvdata2), RPG Maker XP (.rxdata), Ren'Py (.save), Unity (PlayerPrefs, JSON, XML, .es3), Unreal Engine (.sav), SQLite (.db, .sqlite), Python Pickle (.pkl), Ruby Marshal, JSON, XML, MessagePack, CBOR, Protocol Buffers, plist, and many more."}},
+                {"@type": "Question", "name": "What save formats does EditorSaves support?", "acceptedAnswer": {"@type": "Answer", "text": "We are building support for 23+ save formats including RPG Maker MV, MZ, VX Ace, XP, Ren'Py, Unity, Unreal Engine, SQLite, Python Pickle, Ruby Marshal, JSON, XML, MessagePack, CBOR, Protocol Buffers, plist, and many more."}},
                 {"@type": "Question", "name": "Is it safe to upload my save file?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Your files are processed securely and are never shared with third parties. We recommend always backing up your save file before editing, and avoiding setting values to unrealistic extremes that might trigger anti-cheat systems or cause game instability."}},
                 {"@type": "Question", "name": "Do I need to install any software?", "acceptedAnswer": {"@type": "Answer", "text": "No. EditorSaves runs entirely in your browser — Chrome, Firefox, Edge, Safari, or any modern browser. There's nothing to download, no installation, no registration. Just upload, edit, and download."}},
                 {"@type": "Question", "name": "How do I find my game save file?", "acceptedAnswer": {"@type": "Answer", "text": "Save file locations vary by game and platform. On Windows, common locations include Documents, Saved Games, AppData\\Local, and AppData\\Roaming. Many Steam games use Steam Cloud for saves. Check your game's documentation or community forums for the exact path."}},

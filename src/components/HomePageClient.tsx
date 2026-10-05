@@ -21,16 +21,6 @@ const HOME_HTML = String.raw`<!-- ============================================
 <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
 
 <!-- ============================================
-     ANNOUNCEMENT BAR
-     ============================================ -->
-<div class="announcement" role="banner">
-    <span>
-        <span class="announcement-badge">New</span>
-        Now supporting RPG Maker MZ, TyranoBuilder, and 12 new formats
-    </span>
-</div>
-
-<!-- ============================================
      HERO SECTION
      ============================================ -->
 <section class="hero" aria-label="Upload your save file">
@@ -44,11 +34,6 @@ const HOME_HTML = String.raw`<!-- ============================================
 
     <div class="container">
         <div class="hero-content">
-            <div class="hero-badge">
-                <span class="live-dot"></span>
-                100% Free · No Signup · No Installation
-            </div>
-
             <h1>
                 <span class="line">Universal Save Editor Online —</span>
                 <span class="line"><span class="gradient-text">Built for Game Save Files</span></span>

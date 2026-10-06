@@ -62,7 +62,7 @@ export default function Navbar() {
             ))}
           </div>
           <Link
-            href="/contact"
+            href={'/contact' as any}
             className={`site-nav-cta${isActive('/contact') ? ' active' : ''}`}
             aria-current={isActive('/contact') ? 'page' : undefined}
           >
@@ -92,7 +92,7 @@ export default function Navbar() {
           {[...LINKS, { href: '/contact', label: 'Contact' }].map((link) => (
             <Link
               key={link.href}
-              href={link.href}
+              href={link.href as any}
               className={isActive(link.href) ? 'active' : undefined}
               aria-current={isActive(link.href) ? 'page' : undefined}
             >

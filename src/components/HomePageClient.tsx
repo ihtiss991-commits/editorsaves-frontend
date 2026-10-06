@@ -149,7 +149,7 @@ const HOME_HTML = String.raw`<!-- ============================================
     <div class="container">
         <div class="about-grid">
             <div class="about-content reveal-left">
-                <div class="section-eyebrow" style="justify-content:flex-start;">What Is EditorSaves?</div>
+                <div class="section-eyebrow">What Is EditorSaves?</div>
                 <h2 class="section-title">The Universal Save Editor Built for Every Game</h2>
                 <p>
                     <strong>EditorSaves</strong> is a free, browser-based universal save editor that lets you modify game save files without downloading any software. Whether you're stuck in an RPG, want to change your inventory in a visual novel, or need to tweak stats in a Unity game, our tool handles it — directly in your browser.
@@ -215,15 +215,33 @@ const HOME_HTML = String.raw`<!-- ============================================
 <!-- ============================================
      UNIVERSAL SAVE EDITOR EXPLAINER
      ============================================ -->
-<section class="section" aria-label="What is a universal save editor">
+<section class="section prose-section" aria-label="What is a universal save editor">
     <div class="container">
         <div class="section-header reveal">
             <div class="section-eyebrow">Universal Save Editor</div>
             <h2 class="section-title">What Is a Universal Save Editor?</h2>
             <p class="section-desc">A universal save editor aims to give players one place to inspect and work with save files from many games and engines instead of relying on a different utility for every title.</p>
         </div>
-        <p class="section-desc">A game-specific editor is usually designed around one title's known save structure. It can be excellent for that one game, but its usefulness ends when you switch to a different engine, version, or format. A universal approach looks for shared building blocks such as structured data, serialization layers, compression, and recognizable fields while still respecting the differences between games.</p>
-        <p class="section-desc">For players, that matters because save files can be scattered across folders and built with very different technologies. A single browser-based workflow can make it easier to identify a file, understand what it contains, and eventually make controlled changes without installing several separate tools. EditorSaves is studying real files during Phase 1 so that future editing support can be built around actual formats and edge cases rather than assumptions. The goal is broad compatibility without pretending that every file can already be edited safely.</p>
+        <div class="prose-grid prose-grid-2">
+            <article class="prose-card reveal reveal-delay-1">
+                <div class="prose-card-top">
+                    <div class="prose-card-icon blue">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+                    </div>
+                    <span class="prose-card-index" aria-hidden="true">01</span>
+                </div>
+                <p>A game-specific editor is usually designed around one title's known save structure. It can be excellent for that one game, but its usefulness ends when you switch to a different engine, version, or format. A universal approach looks for shared building blocks such as structured data, serialization layers, compression, and recognizable fields while still respecting the differences between games.</p>
+            </article>
+            <article class="prose-card reveal reveal-delay-2">
+                <div class="prose-card-top">
+                    <div class="prose-card-icon green">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    </div>
+                    <span class="prose-card-index" aria-hidden="true">02</span>
+                </div>
+                <p>For players, that matters because save files can be scattered across folders and built with very different technologies. A single browser-based workflow can make it easier to identify a file, understand what it contains, and eventually make controlled changes without installing several separate tools. EditorSaves is studying real files during Phase 1 so that future editing support can be built around actual formats and edge cases rather than assumptions. The goal is broad compatibility without pretending that every file can already be edited safely.</p>
+            </article>
+        </div>
     </div>
 </section>
 
@@ -372,16 +390,42 @@ const HOME_HTML = String.raw`<!-- ============================================
 <!-- ============================================
      SAVE FILE FUNDAMENTALS
      ============================================ -->
-<section class="section" aria-label="How game save files work">
+<section class="section prose-section prose-section-tinted" aria-label="How game save files work">
     <div class="container">
         <div class="section-header reveal">
             <div class="section-eyebrow">Save File Fundamentals</div>
             <h2 class="section-title">How Game Save Files Work</h2>
             <p class="section-desc">A save file is simply data written to disk so a game can restore your progress, but the way that data is serialized can vary dramatically.</p>
         </div>
-        <p class="section-desc">Some saves are human-readable. JSON and XML store named fields in a text structure that can be inspected with a text editor, while SQLite stores information in a database with tables, rows, and columns. Other engines use binary serialization to make files smaller or faster to load. RPG Maker can involve Ruby Marshal data, while some tools and games use Python Pickle or other language-specific serialization formats.</p>
-        <p class="section-desc">Serialization is only one layer. A game may also encode or compress the serialized payload before writing it to disk. Base64 can turn binary data into text-safe characters, LZString can compress text efficiently, and Gzip can wrap compressed bytes inside a standard compression stream. These layers can be combined, so a file that appears to contain unreadable characters may actually hold structured game data underneath several transformations.</p>
-        <p class="section-desc">This is why some saves are easier to edit than others. A plain JSON file can expose obvious fields, while a compressed or binary save may require the exact serializer, version, encoding, and schema before a value can be changed safely. Even when two games share an engine, their save structures can differ because developers choose different fields and data layouts. Phase 1 research helps EditorSaves identify these patterns before promising reliable editing behavior.</p>
+        <div class="prose-grid prose-grid-3">
+            <article class="prose-card reveal reveal-delay-1">
+                <div class="prose-card-top">
+                    <div class="prose-card-icon green">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
+                    </div>
+                    <span class="prose-card-index" aria-hidden="true">01</span>
+                </div>
+                <p>Some saves are human-readable. JSON and XML store named fields in a text structure that can be inspected with a text editor, while SQLite stores information in a database with tables, rows, and columns. Other engines use binary serialization to make files smaller or faster to load. RPG Maker can involve Ruby Marshal data, while some tools and games use Python Pickle or other language-specific serialization formats.</p>
+            </article>
+            <article class="prose-card reveal reveal-delay-2">
+                <div class="prose-card-top">
+                    <div class="prose-card-icon purple">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                    </div>
+                    <span class="prose-card-index" aria-hidden="true">02</span>
+                </div>
+                <p>Serialization is only one layer. A game may also encode or compress the serialized payload before writing it to disk. Base64 can turn binary data into text-safe characters, LZString can compress text efficiently, and Gzip can wrap compressed bytes inside a standard compression stream. These layers can be combined, so a file that appears to contain unreadable characters may actually hold structured game data underneath several transformations.</p>
+            </article>
+            <article class="prose-card reveal reveal-delay-3">
+                <div class="prose-card-top">
+                    <div class="prose-card-icon blue">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </div>
+                    <span class="prose-card-index" aria-hidden="true">03</span>
+                </div>
+                <p>This is why some saves are easier to edit than others. A plain JSON file can expose obvious fields, while a compressed or binary save may require the exact serializer, version, encoding, and schema before a value can be changed safely. Even when two games share an engine, their save structures can differ because developers choose different fields and data layouts. Phase 1 research helps EditorSaves identify these patterns before promising reliable editing behavior.</p>
+            </article>
+        </div>
     </div>
 </section>
 
@@ -510,9 +554,9 @@ const HOME_HTML = String.raw`<!-- ============================================
     <div class="container">
         <div class="usecase-grid">
             <div class="usecase-content">
-                <div class="section-eyebrow reveal-left" style="justify-content:flex-start;">Use Cases</div>
+                <div class="section-eyebrow reveal-left">Use Cases</div>
                 <h2 class="section-title reveal-left reveal-delay-1">What Gamers Use EditorSaves For</h2>
-                <p class="section-desc reveal-left reveal-delay-2" style="text-align: left;">
+                <p class="section-desc reveal-left reveal-delay-2">
                     From recovering lost progress to experimenting with builds, our editor is being developed to make save-file work easier for players and technical users.
                 </p>
 
@@ -773,15 +817,34 @@ const HOME_HTML = String.raw`<!-- ============================================
 <!-- ============================================
      SAVE BACKUP GUIDE
      ============================================ -->
-<section class="section" aria-label="How to back up your save files">
+<section class="section prose-section" aria-label="How to back up your save files">
     <div class="container">
         <div class="section-header reveal">
             <div class="section-eyebrow">Before You Edit</div>
             <h2 class="section-title">How to Back Up Your Save Files</h2>
             <p class="section-desc">A backup is the simplest protection against a broken save, an accidental overwrite, or an unexpected game update.</p>
         </div>
-        <p class="section-desc">On Windows, locate the game's save folder in places such as Documents, Saved Games, AppData\Local, or AppData\Roaming, then copy the original file to a separate folder. On macOS, check Documents, Application Support, Library folders, or the game's own directory. On Linux, common locations include home-directory folders, hidden configuration directories, and game-specific paths under your user profile. Steam Cloud and other synchronization services are useful, but they should not be your only backup.</p>
-        <p class="section-desc">Before making any edit, keep the untouched original and give your copy a clear name such as <code>save-backup</code> with the date. Make another backup before major changes, and avoid overwriting the only known-good file. A reliable rollback copy lets you test a change without turning an experiment into lost progress. This matters even more while save-editing tools are learning new formats, because an unsupported or partially understood structure can behave differently after it is rewritten.</p>
+        <div class="prose-panel reveal reveal-delay-1">
+            <div class="prose-panel-col">
+                <div class="prose-card-top">
+                    <div class="prose-card-icon amber">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                    </div>
+                    <span class="prose-card-index" aria-hidden="true">01</span>
+                </div>
+                <p>On Windows, locate the game's save folder in places such as Documents, Saved Games, AppData\Local, or AppData\Roaming, then copy the original file to a separate folder. On macOS, check Documents, Application Support, Library folders, or the game's own directory. On Linux, common locations include home-directory folders, hidden configuration directories, and game-specific paths under your user profile. Steam Cloud and other synchronization services are useful, but they should not be your only backup.</p>
+            </div>
+            <div class="prose-panel-divider" aria-hidden="true"></div>
+            <div class="prose-panel-col">
+                <div class="prose-card-top">
+                    <div class="prose-card-icon green">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                    </div>
+                    <span class="prose-card-index" aria-hidden="true">02</span>
+                </div>
+                <p>Before making any edit, keep the untouched original and give your copy a clear name such as <code>save-backup</code> with the date. Make another backup before major changes, and avoid overwriting the only known-good file. A reliable rollback copy lets you test a change without turning an experiment into lost progress. This matters even more while save-editing tools are learning new formats, because an unsupported or partially understood structure can behave differently after it is rewritten.</p>
+            </div>
+        </div>
     </div>
 </section>
 

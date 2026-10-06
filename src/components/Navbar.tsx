@@ -53,7 +53,7 @@ export default function Navbar() {
             {LINKS.map((link) => (
               <Link
                 key={link.href}
-                href={link.href}
+                href={link.href as any}
                 className={isActive(link.href) ? 'active' : undefined}
                 aria-current={isActive(link.href) ? 'page' : undefined}
               >

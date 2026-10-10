@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createHash, randomUUID } from 'node:crypto';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
 import { verifyTurnstileToken } from '@/lib/turnstile';
 import { MAX_FILE_SIZE, isAllowedExtension } from '@/lib/constants';
@@ -55,14 +56,64 @@ export async function POST(request: Request) {
       );
     }
 
-    // 5. Upload file to Supabase Storage
+    // 5. Check upload eligibility before storing the file
     const supabase = getSupabaseAdmin();
-    const fileId = crypto.randomUUID();
+    const { data: existingIpUpload, error: ipLookupError } = await supabase
+      .from('uploads')
+      .select('id')
+      .eq('ip_address', clientIp)
+      .limit(1)
+      .maybeSingle();
+
+    if (ipLookupError) {
+      console.error('EditorSaves IP lookup error:', ipLookupError);
+      return NextResponse.json(
+        { success: false, error: 'Could not verify upload eligibility.' },
+        { status: 500 }
+      );
+    }
+
+    if (existingIpUpload) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'You have already uploaded a file. Please share a different save file to help us.',
+        },
+        { status: 400 }
+      );
+    }
+
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const fileHash = createHash('sha256').update(buffer).digest('hex');
+    const { data: existingHashUpload, error: hashLookupError } = await supabase
+      .from('uploads')
+      .select('id')
+      .eq('file_hash', fileHash)
+      .limit(1)
+      .maybeSingle();
+
+    if (hashLookupError) {
+      console.error('EditorSaves file hash lookup error:', hashLookupError);
+      return NextResponse.json(
+        { success: false, error: 'Could not verify upload eligibility.' },
+        { status: 500 }
+      );
+    }
+
+    if (existingHashUpload) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'This save file has already been uploaded. Thank you for trying!',
+        },
+        { status: 400 }
+      );
+    }
+
+    // 6. Upload file to Supabase Storage
+    const fileId = randomUUID();
     const safeFilename = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
     const storagePath = `${fileId}/${safeFilename}`;
-
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
 
     const { error: uploadError } = await supabase.storage
       .from('save-files')
@@ -79,7 +130,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // 6. Insert metadata row into the uploads table
+    // 7. Insert metadata row into the uploads table
     const { error: databaseError } = await supabase
       .from('uploads')
       .insert([
@@ -90,6 +141,7 @@ export async function POST(request: Request) {
           file_size: file.size,
           mime_type: file.type || 'application/octet-stream',
           ip_address: clientIp,
+          file_hash: fileHash,
         },
       ]);
 
@@ -106,7 +158,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // 7. Success
+    // 8. Success
     return NextResponse.json({
       success: true,
       message: 'Thank you! Your file was uploaded successfully.',

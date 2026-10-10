@@ -1140,10 +1140,7 @@ export default function HomePageClient() {
         const message = error instanceof Error
           ? error.message
           : 'The upload could not be completed. Please try again.';
-        setStatus(
-          'error',
-          `${message} If the problem persists, please contact contact@editorsaves.com.`
-        );
+                setStatus('error', message);
       }
     };
 

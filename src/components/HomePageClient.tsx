@@ -58,6 +58,20 @@ const HOME_HTML = String.raw`<!-- ============================================
                         <div class="upload-title">Drop your save file here</div>
                         <div class="upload-subtitle">We'll automatically detect the format and open the editor</div>
 
+                        <div class="game-name-field">
+                            <label for="gameTitle" class="game-name-label">
+                                Which game is this save from? <span class="optional">(optional)</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="gameTitle"
+                                name="gameTitle"
+                                placeholder="e.g. Stardew Valley, RPG Maker MV game…"
+                                maxlength="200"
+                                class="game-name-input"
+                            />
+                        </div>
+
                         <div class="upload-actions">
                             <button class="btn-primary" type="button" id="uploadBtn">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -974,6 +988,7 @@ export default function HomePageClient() {
     const uploadInner = document.getElementById('uploadInner');
     const uploadBtn = document.getElementById('uploadBtn') as HTMLButtonElement | null;
     const uploadActions = uploadInner?.querySelector<HTMLElement>('.upload-actions');
+    const gameTitleInput = uploadInner?.querySelector<HTMLInputElement>('#gameTitle') ?? null;
     const turnstileMount = uploadInner ? (() => {
       const mount = document.createElement('div');
       mount.id = 'turnstileMount';
@@ -1003,6 +1018,7 @@ export default function HomePageClient() {
     const setStatus = (state: 'fileSelected' | 'verifying' | 'uploading' | 'success' | 'error', message: string) => {
       const isProcessingState = state === 'verifying' || state === 'uploading';
       isProcessing = isProcessingState;
+      if (gameTitleInput) gameTitleInput.disabled = isProcessingState;
       const isSuccess = state === 'success';
       const isError = state === 'error';
 
@@ -1130,12 +1146,16 @@ export default function HomePageClient() {
         const formData = new FormData();
         formData.append('file', file, file.name);
         formData.append('turnstileToken', token);
+        const gameTitleInput = document.getElementById('gameTitle') as HTMLInputElement | null;
+        formData.append('gameTitle', gameTitleInput?.value?.trim() || '');
         const response = await fetch('/api/upload', { method: 'POST', body: formData });
         const payload = (await response.json()) as { success?: boolean; message?: string; error?: string };
         if (!response.ok || !payload.success) {
           throw new Error(payload.error || 'The upload could not be completed. Please try again.');
         }
         setStatus('success', payload.message || 'Thank you! Your file was uploaded successfully.');
+        const resetInput = document.getElementById('gameTitle') as HTMLInputElement | null;
+        if (resetInput) resetInput.value = '';
       } catch (error) {
         const message = error instanceof Error
           ? error.message
@@ -1234,7 +1254,7 @@ export default function HomePageClient() {
 
     const uploadContainerClick = (event: MouseEvent) => {
       const target = event.target as Element | null;
-      if (!target?.closest('#uploadBtn')) triggerFilePicker();
+      if (!target?.closest('#uploadBtn, .game-name-field')) triggerFilePicker();
     };
 
     const uploadButtonClick = (event: MouseEvent) => {
@@ -1243,7 +1263,8 @@ export default function HomePageClient() {
     };
 
     const uploadKeydown = (event: KeyboardEvent) => {
-      if (event.key === 'Enter' || event.key === ' ') {
+      const target = event.target as Element | null;
+      if ((event.key === 'Enter' || event.key === ' ') && !target?.closest('.game-name-field')) {
         event.preventDefault();
         triggerFilePicker();
       }

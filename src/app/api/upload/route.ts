@@ -12,6 +12,8 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
     const turnstileToken = formData.get('turnstileToken') as string | null;
+    const gameTitleRaw = (formData.get('gameTitle') as string | null) || '';
+    const gameTitle = gameTitleRaw.trim().slice(0, 200);
 
     // 1. Validate file presence
     if (!file) {
@@ -142,6 +144,11 @@ export async function POST(request: Request) {
           mime_type: file.type || 'application/octet-stream',
           ip_address: clientIp,
           file_hash: fileHash,
+          reported_game_title: gameTitle || null,
+          reported_game_title_key: gameTitle
+            ? gameTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+            : null,
+          content_status: 'user_uploaded',
         },
       ]);
 

@@ -77,7 +77,6 @@ const HOME_HTML = `
 </div>
 <div aria-live="polite" data-state="idle" hidden="" id="esUploadStatus" role="status"></div>
 <div aria-label="Security verification" id="turnstileMount"></div>
-<button class="btn" disabled="" hidden="" id="upload-file-btn" type="button">Upload Save File</button>
 <div class="upload-trustline" aria-hidden="true">
   <span class="upload-trustline-item"><svg viewBox="0 0 24 24"><path d="M7 10V7a5 5 0 0 1 10 0v3"/><rect x="4" y="10" width="16" height="11" rx="2"/><path d="m9 15 2 2 4-4"/></svg> Secure upload</span>
   <span class="upload-trustline-divider"></span>
@@ -492,10 +491,9 @@ export default function HomePageClient() {
     const input = root?.querySelector<HTMLInputElement>('#save-file');
     const uploadBox = root?.querySelector<HTMLElement>('#upload-box');
     const pickerLabel = root?.querySelector<HTMLElement>('label[for="save-file"]');
-    const submitButton = root?.querySelector<HTMLButtonElement>('#upload-file-btn');
     const status = root?.querySelector<HTMLElement>('#esUploadStatus');
     const turnstileMount = root?.querySelector<HTMLElement>('#turnstileMount');
-    if (!root || !input || !uploadBox || !submitButton || !status || !turnstileMount) return;
+    if (!root || !input || !uploadBox || !status || !turnstileMount) return;
 
     input.accept = ALLOWED_EXTENSIONS.join(',');
     const TOKEN_REFRESH_AFTER_MS = 4 * 60 * 1000;
@@ -584,8 +582,6 @@ export default function HomePageClient() {
     const showVerificationPending = (message: string) => {
       if (!selectedFile || isUploading) return;
       uploadBox.classList.add('is-processing');
-      submitButton.hidden = false;
-      submitButton.disabled = true;
       setStatus('verifying', message);
     };
 
@@ -605,13 +601,10 @@ export default function HomePageClient() {
       tokenCreatedAt = Date.now();
       verificationIssue = null;
       scheduleTokenRefresh();
-      if (selectedFile && !submitButton.hidden && !isUploading) {
-        submitButton.disabled = false;
-        // Preserve a clear error until the visitor tries again, while still making a refreshed token ready.
-        if (status.dataset.state !== 'error') {
-          uploadBox.classList.remove('is-processing');
-          setStatus('info', 'The background security check is ready. Your file has not been uploaded yet. Select “Upload Save File” when you are ready.');
-        }
+      
+      // AUTO-START UPLOAD: If a file is waiting and we have a token, upload immediately
+      if (selectedFile && !isUploading && status.dataset.state !== 'error' && status.dataset.state !== 'success') {
+        void uploadFile();
       }
     };
 
@@ -622,7 +615,6 @@ export default function HomePageClient() {
         verificationIssue = 'Upload verification is not configured. Add NEXT_PUBLIC_TURNSTILE_SITE_KEY in Vercel Environment Variables, then redeploy.';
         if (selectedFile) {
           uploadBox.classList.remove('is-processing');
-          submitButton.hidden = true;
           setStatus('error', verificationIssue);
         }
         return;
@@ -643,7 +635,6 @@ export default function HomePageClient() {
             token = null;
             tokenCreatedAt = 0;
             verificationIssue = 'The background security check could not be completed. Please try again.';
-            submitButton.disabled = true;
             if (selectedFile && !isUploading) {
               uploadBox.classList.remove('is-processing');
               setStatus('error', verificationIssue);
@@ -669,7 +660,6 @@ export default function HomePageClient() {
           : 'Security verification could not be loaded.';
         if (selectedFile) {
           uploadBox.classList.remove('is-processing');
-          submitButton.hidden = true;
           setStatus('error', verificationIssue);
         }
       } finally {
@@ -697,7 +687,6 @@ export default function HomePageClient() {
       }
 
       isUploading = true;
-      submitButton.disabled = true;
       input.disabled = true;
       uploadBox.classList.add('is-processing');
       setStatus('uploading', 'Transferring your file securely and saving its collection record. Please keep this page open.');
@@ -705,7 +694,6 @@ export default function HomePageClient() {
         const formData = new FormData();
         formData.append('file', selectedFile, selectedFile.name);
         formData.append('turnstileToken', token);
-        // The existing homepage does not collect a game title; the API accepts it as optional.
         formData.append('gameTitle', '');
         const response = await fetch('/api/upload', { method: 'POST', body: formData });
         const payload = await response.json() as { success?: boolean; message?: string; error?: string };
@@ -716,10 +704,12 @@ export default function HomePageClient() {
         clearTokenRefreshTimer();
         setStatus('success', payload.message || 'Thank you! Your file was uploaded successfully.');
         uploadBox.classList.remove('is-processing');
-        submitButton.hidden = true;
-        submitButton.disabled = true;
+        
+        // Clear the selected file so it doesn't auto-upload again on token refresh
+        selectedFile = null; 
         token = null;
         tokenCreatedAt = 0;
+        
         if (widgetId && window.turnstile?.remove) window.turnstile.remove(widgetId);
         widgetId = undefined;
       } catch (error) {
@@ -729,9 +719,6 @@ export default function HomePageClient() {
       } finally {
         isUploading = false;
         input.disabled = false;
-        if (selectedFile && !submitButton.hidden && token && Date.now() - tokenCreatedAt < TOKEN_REFRESH_AFTER_MS) {
-          submitButton.disabled = false;
-        }
       }
     };
 
@@ -739,30 +726,32 @@ export default function HomePageClient() {
       if (!file || isUploading) return;
       selectedFile = file;
       uploadBox.classList.remove('is-processing');
+      
+      // Clear previous error state when a new file is selected
+      if (status.dataset.state === 'error') {
+        status.dataset.state = 'idle';
+      }
 
       if (file.size <= 0) {
-        submitButton.hidden = true;
         setStatus('error', 'The selected file is empty. Please choose a valid save file.');
         return;
       }
       if (file.size > MAX_FILE_SIZE_BYTES) {
-        submitButton.hidden = true;
         setStatus('error', `The selected file exceeds the ${MAX_FILE_SIZE_LABEL} size limit.`);
         return;
       }
       if (!isAllowedExtension(file.name)) {
-        submitButton.hidden = true;
         setStatus('error', `Unsupported file type: ${getExtension(file.name) || 'no extension'}. Please choose a supported save-file format.`);
         return;
       }
 
-      submitButton.hidden = false;
       const tokenIsFresh = Boolean(token) && Date.now() - tokenCreatedAt < TOKEN_REFRESH_AFTER_MS;
       if (tokenIsFresh) {
-        submitButton.disabled = false;
-        setStatus('info', 'The background security check is ready. Your file has not been uploaded yet. Select “Upload Save File” when you are ready.');
+        // Token is already ready, upload immediately
+        void uploadFile();
       } else {
-        showVerificationPending(verificationIssue || 'Finishing the background security check. Your file has not been uploaded yet.');
+        // Token isn't ready, show verifying state. Turnstile will trigger the upload via onTokenReady
+        showVerificationPending(verificationIssue || 'Verifying secure connection...');
         if (widgetId && token) {
           requestFreshToken();
         } else if (widgetId && verificationIssue && !isInitializing) {
@@ -774,7 +763,6 @@ export default function HomePageClient() {
     };
 
     const onInputChange = () => handleFile(input.files?.[0]);
-    const onSubmitClick = () => { void uploadFile(); };
     const onDragOver = (event: DragEvent) => {
       event.preventDefault();
       uploadBox.classList.add('is-dragover');
@@ -796,20 +784,17 @@ export default function HomePageClient() {
     };
 
     input.addEventListener('change', onInputChange);
-    submitButton.addEventListener('click', onSubmitClick);
     uploadBox.addEventListener('dragover', onDragOver);
     uploadBox.addEventListener('dragleave', onDragLeave);
     uploadBox.addEventListener('drop', onDrop);
     pickerLabel?.addEventListener('keydown', onLabelKeydown);
 
-    // Start Turnstile as soon as the homepage mounts; the visitor does not need to reach the upload box first.
     void startVerification();
 
     return () => {
       disposed = true;
       clearTokenRefreshTimer();
       input.removeEventListener('change', onInputChange);
-      submitButton.removeEventListener('click', onSubmitClick);
       uploadBox.removeEventListener('dragover', onDragOver);
       uploadBox.removeEventListener('dragleave', onDragLeave);
       uploadBox.removeEventListener('drop', onDrop);

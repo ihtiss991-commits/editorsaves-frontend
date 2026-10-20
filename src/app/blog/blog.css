@@ -1,0 +1,18 @@
+/* Scoped visual treatment for the blog coming-soon state. */
+.blog-coming-soon { min-height: 520px; display: flex; align-items: center; padding-block: 84px 96px; }
+.blog-coming-soon-inner { width: 100%; max-width: 980px; text-align: center; }
+.blog-coming-soon-inner .page-lead { margin-inline: auto; }
+.blog-coming-soon-mark { position: relative; display: flex; width: 116px; height: 106px; align-items: center; justify-content: center; margin: 29px auto 10px; }
+.blog-coming-soon-orbit { position: absolute; border: 1px dashed rgba(99,102,241,.27); border-radius: 50%; }
+.blog-coming-soon-orbit-one { inset: 8px 0; transform: rotate(-24deg); animation: blog-orbit-slow 17s linear infinite; }
+.blog-coming-soon-orbit-two { inset: 0 12px; border-color: rgba(14,165,233,.22); transform: rotate(23deg); animation: blog-orbit-slow-reverse 21s linear infinite; }
+.blog-coming-soon-book { display: flex; width: 68px; height: 68px; align-items: center; justify-content: center; border: 1px solid #e0e7ff; border-radius: 23px; background: linear-gradient(145deg,#fff,#f1f3ff); box-shadow: 0 20px 42px -28px rgba(79,70,229,.65); }
+.blog-coming-soon-book svg { width: 43px; height: 43px; stroke: #5b5de9; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.blog-coming-soon-actions { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 14px; margin-top: 31px; }
+.blog-coming-soon-actions .btn-primary { padding: 14px 25px; font-size: .92rem; }
+.blog-coming-soon-secondary { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 13px 22px; border: 1px solid #e1e5ef; border-radius: 999px; background: rgba(255,255,255,.8); color: #334155; font-size: .9rem; font-weight: 750; transition: transform .2s ease, border-color .2s ease, background .2s ease; }
+.blog-coming-soon-secondary:hover { transform: translateY(-2px); border-color: #c7d2fe; background: #fff; }
+@keyframes blog-orbit-slow { from { transform: rotate(-24deg); } to { transform: rotate(336deg); } }
+@keyframes blog-orbit-slow-reverse { from { transform: rotate(23deg); } to { transform: rotate(-337deg); } }
+@media (prefers-reduced-motion: reduce) { .blog-coming-soon-orbit-one, .blog-coming-soon-orbit-two { animation: none !important; } }
+@media (max-width: 560px) { .blog-coming-soon { min-height: 450px; padding-block: 64px 74px; } .blog-coming-soon-mark { margin-top: 22px; } .blog-coming-soon-actions { flex-direction: column; align-items: stretch; } .blog-coming-soon-actions > * { justify-content: center; } }

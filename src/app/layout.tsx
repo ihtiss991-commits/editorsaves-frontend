@@ -31,10 +31,10 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'EditorSaves — Edit Game Saves Safely & Easily',
+    default: 'Free Online Game Save Editor — Edit & Modify Saves Instantly',
     template: '%s | EditorSaves'
   },
-  description: 'Free browser-based save editor to modify game save files safely. Edit money, items, skills and more. No install required. Start editing today.',
+  description: 'Modify gold, items, stats, and variables in your game save files directly in your browser. No downloads, no installations.',
   alternates: { canonical: SITE_URL }
 };
 

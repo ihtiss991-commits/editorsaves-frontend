@@ -3,8 +3,8 @@ import HomePageClient from '@/components/HomePageClient';
 import { SITE_URL } from '@/lib/constants';
 import './homepage.css';
 
-const title = 'EditorSaves — Edit Game Saves Safely & Easily';
-const description = 'Free browser-based save editor to modify game save files safely. Edit money, items, skills and more. No install required. Start editing today.';
+const title = 'Free Online Game Save Editor — Edit & Modify Saves Instantly';
+const description = 'Modify gold, items, stats, and variables in your game save files directly in your browser. No downloads, no installations.';
 
 export const metadata: Metadata = {
   title: { absolute: title },
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     type: 'website',
     url: `${SITE_URL}/`,
     siteName: 'EditorSaves',
-    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'EditorSaves — Edit Game Saves Safely & Easily' }]
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: title }]
   },
   twitter: {
     card: 'summary_large_image',

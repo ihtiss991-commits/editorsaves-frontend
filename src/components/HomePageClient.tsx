@@ -39,7 +39,7 @@ const HOME_HTML = `
 <header class="hero">
 <div class="wrap">
 <span class="badge">Free · Browser‑based · No install</span>
-<h1>Editorsaves — Edit Game Saves Safely and Easily</h1>
+<h1>Free Online Game Save Editor — Edit &amp; Modify Saves Instantly</h1>
 <p>
           Save Editor is a powerful, free online tool that lets you modify game save files in seconds.
           Change money, items, skills, and more — without risking your progress. Built for players

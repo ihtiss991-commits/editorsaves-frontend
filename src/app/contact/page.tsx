@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { SITE_URL } from '@/lib/constants';
 
 export const metadata: Metadata = {
@@ -43,6 +44,7 @@ export default function ContactPage() {
             <span className="page-kicker">Contact</span>
             <h1 className="page-title">Contact EditorSaves</h1>
             <p className="page-lead">Send a message with enough detail to reproduce the issue or understand the format you are talking about. The same design language as the homepage keeps the form simple and focused.</p>
+            <Link href="/" className="btn-primary">Return to the EditorSaves homepage</Link>
           </div>
         </section>
         <section className="page-section">

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { SITE_URL } from '@/lib/constants';
 
 export const metadata: Metadata = {
@@ -27,6 +28,7 @@ export default function AboutPage() {
             <span className="page-kicker">About EditorSaves</span>
             <h1 className="page-title">About EditorSaves</h1>
             <p className="page-lead">Learn about EditorSaves, the project building a universal game save editor by studying real save files, engine formats, parser needs, and difficult edge cases.</p>
+            <Link href="/" className="btn-primary">Visit the EditorSaves homepage</Link>
           </div>
         </section>
 

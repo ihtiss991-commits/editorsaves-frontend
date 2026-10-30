@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 
 export const runtime = 'edge';
-export const alt = 'EditorSaves — Universal Save Editor Online';
+export const alt = 'Free Online Game Save Editor — Edit & Modify Saves Instantly';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -25,11 +25,11 @@ export default async function Image() {
         <div style={{ fontSize: 60, fontWeight: 900, marginBottom: 20, letterSpacing: '-0.03em' }}>
           EditorSaves
         </div>
-        <div style={{ fontSize: 36, fontWeight: 600, color: '#5b6ef5', textAlign: 'center', lineHeight: 1.2 }}>
-          Universal Save Editor Online
+        <div style={{ fontSize: 48, fontWeight: 600, color: '#5b6ef5', textAlign: 'center', lineHeight: 1.2 }}>
+          Free Online Game Save Editor
         </div>
-        <div style={{ fontSize: 24, fontWeight: 400, color: '#5a6a85', marginTop: 20, textAlign: 'center' }}>
-          RPG Maker · Ren'Py · Unity · Unreal Engine
+        <div style={{ fontSize: 48, fontWeight: 600, color: '#5b6ef5', textAlign: 'center', lineHeight: 1.2 }}>
+          Edit &amp; Modify Saves Instantly
         </div>
       </div>
     ),

@@ -5,6 +5,7 @@ import './homepage.css';
 
 const title = 'Free Online Game Save Editor — Edit & Modify Saves Instantly';
 const description = 'Modify gold, items, stats, and variables in your game save files directly in your browser. No downloads, no installations.';
+const socialImage = `${SITE_URL}/opengraph-image`;
 
 export const metadata: Metadata = {
   title: { absolute: title },
@@ -17,13 +18,13 @@ export const metadata: Metadata = {
     type: 'website',
     url: `${SITE_URL}/`,
     siteName: 'EditorSaves',
-    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: title }]
+    images: [{ url: socialImage, width: 1200, height: 630, alt: title }]
   },
   twitter: {
     card: 'summary_large_image',
     title,
     description,
-    images: ['/og-image.jpg']
+    images: [socialImage]
   }
 };
 
@@ -38,9 +39,9 @@ const structuredData = {
       description,
       isPartOf: { '@id': `${SITE_URL}/#website` },
       about: { '@id': `${SITE_URL}/#software` },
-      primaryImageOfPage: { '@type': 'ImageObject', url: `${SITE_URL}/og-image.jpg` },
+      primaryImageOfPage: { '@type': 'ImageObject', url: socialImage },
       datePublished: '2026-10-20',
-      dateModified: '2026-10-20',
+      dateModified: '2026-10-30',
       inLanguage: 'en'
     },
     {
@@ -62,7 +63,7 @@ const structuredData = {
       '@type': 'SoftwareApplication',
       '@id': `${SITE_URL}/#software`,
       name: 'EditorSaves Save Editor',
-      applicationCategory: 'GameApplication',
+      applicationCategory: 'UtilitiesApplication',
       operatingSystem: 'Web',
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       description: 'A browser-based save-file project designed to help players work with game save files.',

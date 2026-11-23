@@ -89,19 +89,30 @@ async function transformZlib(
   mode: "compress" | "decompress",
   maxBytes: number
 ): Promise<Uint8Array> {
-  const StreamConstructor = mode === "compress" ? CompressionStream : DecompressionStream;
+  if (mode === "compress") {
+    if (typeof CompressionStream === "undefined") {
+      throw new SaveEngineError(
+        "CODEC_UNAVAILABLE",
+        "This runtime does not provide the required zlib compression API."
+      );
+    }
 
-  if (typeof StreamConstructor === "undefined") {
+    const stream = streamFromBytes(input).pipeThrough(
+      new CompressionStream("deflate")
+    );
+    return collectLimited(stream, maxBytes);
+  }
+
+  if (typeof DecompressionStream === "undefined") {
     throw new SaveEngineError(
       "CODEC_UNAVAILABLE",
-      "This runtime does not provide the required zlib stream API."
+      "This runtime does not provide the required zlib decompression API."
     );
   }
 
-  const stream = mode === "compress"
-    ? streamFromBytes(input).pipeThrough(new CompressionStream("deflate"))
-    : streamFromBytes(input).pipeThrough(new DecompressionStream("deflate"));
-
+  const stream = streamFromBytes(input).pipeThrough(
+    new DecompressionStream("deflate")
+  );
   return collectLimited(stream, maxBytes);
 }
 

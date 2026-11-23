@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import type { CSSProperties, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -24,7 +24,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="en" style={{ '--font-inter': 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', '--font-space': 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', '--font-jetbrains': 'ui-monospace, SFMono-Regular, Menlo, monospace' } as CSSProperties}>
+    <html lang="en">
       <body>
         <Navbar />
         <main>{children}</main>

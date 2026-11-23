@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: 'How to Edit Save Files — Guides & Tips',
   description: 'Learn how to edit save files with practical game save guides covering RPG Maker, Ren’Py, Unity, save formats, backups, troubleshooting, and safe editing.',
   alternates: { canonical: `${SITE_URL}/blog` },
+  robots: { index: false, follow: true },
   openGraph: {
     title: 'How to Edit Save Files — Guides & Tips | EditorSaves',
     description: 'Learn how to edit save files with practical game save guides covering RPG Maker, Ren’Py, Unity, save formats, backups, troubleshooting, and safe editing.',

@@ -5,36 +5,19 @@ import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
-import { SITE_URL } from '@/lib/constants';
+import { SITE_DESCRIPTION, SITE_URL } from '@/lib/constants';
 
-const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-inter',
-  weight: ['300', '400', '500', '600', '700', '800', '900'],
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-jetbrains',
-  weight: ['400', '500', '600'],
-});
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-space',
-  weight: ['400', '500', '600', '700'],
-});
+const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter', weight: ['300', '400', '500', '600', '700', '800', '900'] });
+const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], display: 'swap', variable: '--font-jetbrains', weight: ['400', '500', '600'] });
+const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], display: 'swap', variable: '--font-space', weight: ['400', '500', '600', '700'] });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Free Online Game Save Editor — Edit & Modify Saves Instantly',
+    default: 'Game Save File Research for a Future Universal Save Editor',
     template: '%s | EditorSaves'
   },
-  description: 'Modify gold, items, stats, and variables in your game save files directly in your browser. No downloads, no installations.',
+  description: SITE_DESCRIPTION,
   alternates: { canonical: SITE_URL }
 };
 

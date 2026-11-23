@@ -100,3 +100,18 @@ test("decompressed output limit is enforced", async () => {
     (error) => error instanceof SaveEngineError && error.code === "DECOMPRESSED_TOO_LARGE"
   );
 });
+
+
+test("edited numeric fields survive save serialization", async () => {
+  for (const format of ["rpg-maker-mv", "rpg-maker-mz"]) {
+    const edited = structuredClone(slotFixture);
+    edited.party._gold = 987654;
+
+    const encoded = await serializeSaveFile(format, edited);
+    const reparsed = await parseSaveFile(encoded);
+
+    assert.equal(reparsed.format, format);
+    assert.equal(reparsed.data.party?._gold, 987654);
+    assert.deepEqual(reparsed.data.pluginData, slotFixture.pluginData);
+  }
+});

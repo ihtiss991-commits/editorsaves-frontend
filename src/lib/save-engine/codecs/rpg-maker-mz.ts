@@ -97,9 +97,11 @@ async function transformZlib(
       );
     }
 
-    const stream = streamFromBytes(input).pipeThrough(
-      new CompressionStream("deflate")
-    );
+    const transform = new CompressionStream("deflate") as unknown as TransformStream<
+      Uint8Array,
+      Uint8Array
+    >;
+    const stream = streamFromBytes(input).pipeThrough(transform);
     return collectLimited(stream, maxBytes);
   }
 
@@ -110,9 +112,11 @@ async function transformZlib(
     );
   }
 
-  const stream = streamFromBytes(input).pipeThrough(
-    new DecompressionStream("deflate")
-  );
+  const transform = new DecompressionStream("deflate") as unknown as TransformStream<
+    Uint8Array,
+    Uint8Array
+  >;
+  const stream = streamFromBytes(input).pipeThrough(transform);
   return collectLimited(stream, maxBytes);
 }
 

@@ -177,6 +177,39 @@ const HOME_HTML = `
 </section>
 `;
 
+function ensureTurnstileLoaded(): Promise<TurnstileInstance> {
+  if (window.turnstile) return Promise.resolve(window.turnstile);
+
+  const existing = document.querySelector<HTMLScriptElement>('script[data-editorsaves-turnstile]');
+  if (existing) {
+    return new Promise((resolve, reject) => {
+      const timeout = window.setTimeout(
+        () => reject(new Error('Security verification could not be loaded.')),
+        15000,
+      );
+      const poll = window.setInterval(() => {
+        if (!window.turnstile) return;
+        window.clearTimeout(timeout);
+        window.clearInterval(poll);
+        resolve(window.turnstile);
+      }, 50);
+    });
+  }
+
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+    script.async = true;
+    script.defer = true;
+    script.dataset.editorsavesTurnstile = 'true';
+    script.onload = () => window.turnstile
+      ? resolve(window.turnstile)
+      : reject(new Error('Security verification loaded without its API.'));
+    script.onerror = () => reject(new Error('Security verification could not be loaded.'));
+    document.head.appendChild(script);
+  });
+}
+
 export default function HomePageClient() {
   useEffect(() => {
     const root = document.querySelector<HTMLElement>('.editorsaves-home');

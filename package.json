@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:save-engine": "node --experimental-strip-types --test tests/save-engine/*.test.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",
@@ -15,7 +16,8 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-turnstile": "^1.1.3",
-    "server-only": "^0.0.1"
+    "server-only": "^0.0.1",
+    "lz-string": "1.5.0"
   },
   "devDependencies": {
     "@types/node": "^20.17.16",

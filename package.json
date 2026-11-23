@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run test:save-engine && next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test:save-engine": "node --experimental-strip-types --test tests/save-engine/*.test.mjs"

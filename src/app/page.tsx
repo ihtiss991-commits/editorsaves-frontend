@@ -3,7 +3,7 @@ import HomePageClient from '@/components/HomePageClient';
 import { SITE_URL } from '@/lib/constants';
 import './homepage.css';
 
-const title = 'Game Save File Research for a Future Universal Save Editor | EditorSaves';
+const title = 'Game Save File Research for a Future Save Editor | EditorSaves';
 const description =
   'Contribute a game save file to EditorSaves research into save formats, compression, and game-specific data structures. Editing is not live yet.';
 const socialImage = `${SITE_URL}/opengraph-image`;

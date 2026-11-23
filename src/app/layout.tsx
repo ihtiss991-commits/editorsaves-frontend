@@ -9,7 +9,7 @@ import { SITE_DESCRIPTION, SITE_URL } from '@/lib/constants';
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Game Save File Research for a Future Universal Save Editor',
+    default: 'Game Save File Research for a Future Save Editor',
     template: '%s | EditorSaves'
   },
   description: SITE_DESCRIPTION,

@@ -22,453 +22,17 @@ declare global {
   interface Window { turnstile?: TurnstileInstance; }
 }
 
-const LEGACY_HOME_HTML = `
-<style>
-  /* FIX: Reduce excessive padding between Header and Badge, and reveal the buttons */
-  .editorsaves-home .hero {
-    padding: 60px 0 80px !important;
-  }
-  @media (max-width: 720px) {
-    .editorsaves-home .hero {
-      padding: 40px 0 60px !important;
-    }
-  }
-</style>
-
-<!-- Hero -->
-<header class="hero">
-<div class="wrap">
-<span class="badge">Free · Browser‑based · No install</span>
-<h1>Free Online Game Save Editor — Edit &amp; Modify Saves Instantly</h1>
-<p>
-          Save Editor is a powerful, free online tool that lets you modify game save files in seconds.
-          Change money, items, skills, and more — without risking your progress. Built for players
-          who want control, speed, and peace of mind.
-        </p>
-<div class="hero-actions">
-<a class="btn" href="#upload-box">Upload file now</a>
-<a class="btn secondary" href="/blog">Blog — Coming Soon</a>
-</div>
-</div>
-</header>
-
-<!-- Upload Box Section -->
-<section class="upload-section">
-<div class="wrap">
-<div class="upload-container" id="upload-box">
-<div class="upload-topline" aria-hidden="true">
-  <span class="upload-topline-pill"><span class="upload-topline-spark"></span> Secure save-file collection</span>
-  <span class="upload-background-note"><span class="upload-background-dot"></span> Background security check</span>
-</div>
-<div class="upload-art" aria-hidden="true">
-  <span class="upload-art-ring upload-art-ring-one"></span>
-  <span class="upload-art-ring upload-art-ring-two"></span>
-  <div class="upload-icon"></div>
-  <span class="upload-floating-tag upload-floating-tag-one">.SAV</span>
-  <span class="upload-floating-tag upload-floating-tag-two">.JSON</span>
-  <span class="upload-floating-tag upload-floating-tag-three">SAVE</span>
-</div>
-<h3>Upload your save file</h3>
-<p>Drag &amp; drop your save file here, or click to browse</p>
-<input accept=".rpgsave,.rmmzsave,.save,.rvdata2,.rvdata,.rxdata,.sav,.dat,.json,.xml,.sqlite,.db,.plr,.wld,.rsv,.sol,.sgs,.qsp,.ksd,.pkl,.pickle,.es3,.lsd" aria-label="Choose a game save file" class="file-input" id="save-file" name="file" type="file"/>
-<div class="upload-select-row">
-  <label aria-controls="save-file" class="btn" for="save-file" role="button" tabindex="0">Select File</label>
-  <span class="upload-select-hint">or drop it anywhere in this box</span>
-</div>
-<div aria-live="polite" data-state="idle" hidden="" id="esUploadStatus" role="status"></div>
-<div aria-label="Security verification" id="turnstileMount"></div>
-<div class="upload-trustline" aria-hidden="true">
-  <span class="upload-trustline-item"><svg viewBox="0 0 24 24"><path d="M7 10V7a5 5 0 0 1 10 0v3"/><rect x="4" y="10" width="16" height="11" rx="2"/><path d="m9 15 2 2 4-4"/></svg> Secure upload</span>
-  <span class="upload-trustline-divider"></span>
-  <span class="upload-trustline-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></svg> No account required</span>
-</div>
-</div>
-</div>
-</section>
-
-<!-- Introduction / What is a save editor -->
-<section>
-<div class="wrap prose">
-<h2>What Is a Save Editor — and Why Do You Need One?</h2>
-<p>
-          A save editor is a specialized tool that reads and modifies the save files created by video
-          games. Every time you play a game, it stores your progress — your character’s level, your
-          inventory, your in‑game currency, quest states, and much more — in a save file. A save editor
-          gives you direct, structured access to that data so you can change it deliberately.
-        </p>
-<p>
-          Whether you want to recover from a corrupted save, experiment with a build you would not
-          normally try, or simply skip the grind after a long day, a save editor puts the control back
-          in your hands. Unlike cheat codes or memory editors, a save editor works on the save file
-          itself — it does not touch the game’s running process, which makes it cleaner and generally
-          safer when used correctly.
-        </p>
-<div class="highlight-block">
-<p>
-            Our <strong>Save Editor</strong> is designed to be approachable for beginners and powerful
-            enough for advanced users. It runs entirely in your browser, so there is nothing to install,
-            no shady executables to trust, and no background processes running on your machine. You
-            upload a save file, choose what you want to change, and download the edited file. That is it.
-          </p>
-</div>
-<div class="note">
-<strong>Important:</strong> Always back up your original save file before editing. Even
-          the best tools can produce unexpected results if a value is outside the range the game
-          expects. A simple copy‑paste of your save folder takes seconds and can save you hours.
-        </div>
-</div>
-</section>
-
-<!-- How it works -->
-<section class="alt" id="how-it-works">
-<div class="wrap">
-<h2>How the Save Editor Works — Three Simple Steps</h2>
-<p class="section-lead">
-          You do not need to be a programmer or a modder. The workflow is intentionally simple, and
-          every step is reversible because you keep your original file.
-        </p>
-<div class="grid cols-3">
-<div class="card">
-<span class="badge">Step 1</span>
-<h3>Upload your save file</h3>
-<p>
-              Locate your game’s save folder (we provide guides for popular titles in our
-              <a href="/blog">blog</a>) and upload the file. The editor reads the structure and
-              shows you the editable values it recognizes.
-            </p>
-</div>
-<div class="card">
-<span class="badge">Step 2</span>
-<h3>Change what you want</h3>
-<p>
-              Adjust currency, experience, item quantities, skill points, and other supported fields.
-              You see the exact values before you commit — no guesswork.
-            </p>
-</div>
-<div class="card">
-<span class="badge">Step 3</span>
-<h3>Download and play</h3>
-<p>
-              Export the edited save, place it back in the game’s save folder, and launch the game.
-              Your changes are applied. If anything looks wrong, restore your backup and try again.
-            </p>
-</div>
-</div>
-</div>
-</section>
-
-<!-- Features -->
-<section>
-<div class="wrap">
-<h2>Everything You Need in a Save Editor</h2>
-<p class="section-lead">
-          We built Save Editor around the features players actually use — not a bloated list of
-          half‑working options.
-        </p>
-<div class="grid cols-3">
-<div class="card icon-card feature-card">
-<h3>Smart value detection</h3>
-<p>
-              The editor identifies common data types and highlights fields that are safe to modify.
-              You do not need to understand hex offsets or binary structures.
-            </p>
-</div>
-<div class="card icon-card feature-card">
-<h3>Privacy‑first, browser‑based</h3>
-<p>
-              Your save file is processed locally in your browser whenever possible. We do not
-              permanently store your saves, and we never ask for account credentials.
-            </p>
-</div>
-<div class="card icon-card feature-card">
-<h3>Backup and restore built in</h3>
-<p>
-              Before applying any change, the tool creates a reversible copy of the original state
-              in your session. You can undo edits without leaving the page.
-            </p>
-</div>
-<div class="card icon-card feature-card">
-<h3>Broad game support</h3>
-<p>
-              We actively maintain support for popular single‑player titles and are transparent
-              about what is and is not editable. Check our <a href="/blog">blog</a> for the
-              latest compatibility notes.
-            </p>
-</div>
-<div class="card icon-card feature-card">
-<h3>No installation, no bloat</h3>
-<p>
-              There is no desktop app to download, no browser extension to grant permissions to,
-              and no “pro” version that removes basic features. The core editor is free.
-            </p>
-</div>
-<div class="card icon-card feature-card">
-<h3>Guides and documentation</h3>
-<p>
-              New to save editing? Our <a href="/blog">blog</a> publishes step‑by‑step guides,
-              safety checklists, and explanations of how save files work under the hood.
-            </p>
-</div>
-</div>
-</div>
-</section>
-
-<!-- Supported games & use cases -->
-<section class="alt">
-<div class="wrap">
-<h2>What Can You Edit — and Which Games Are Supported?</h2>
-<div class="prose">
-<p>
-            Save Editor is not a one‑game tool. It is built on a flexible parsing engine that we
-            extend over time. The table below shows the categories of data we support most reliably.
-            For a current list of specific games, see the compatibility section on our
-            <a href="/blog">blog</a>.
-          </p>
-</div>
-<div class="table-wrap">
-<table>
-<thead>
-<tr>
-<th>Data category</th>
-<th>What you can change</th>
-<th>Typical use case</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Currency &amp; resources</td>
-<td>Gold, credits, gems, crafting materials</td>
-<td>Skip repetitive farming; recover from a bad purchase</td>
-</tr>
-<tr>
-<td>Character progression</td>
-<td>Level, XP, skill points, attribute points</td>
-<td>Try a late‑game build without a full playthrough</td>
-</tr>
-<tr>
-<td>Inventory &amp; items</td>
-<td>Item quantities, durability, unlock flags</td>
-<td>Replace a lost quest item; experiment with gear</td>
-</tr>
-<tr>
-<td>Quest &amp; world state</td>
-<td>Quest stages, discovered locations, faction standing</td>
-<td>Recover from a broken quest trigger</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="prose">
-<h3>Common reasons players use a save editor</h3>
-<ul>
-<li>
-<strong>Recovery:</strong> A quest item disappeared, a save corrupted after a crash,
-              or an NPC is stuck. Editing the save can sometimes repair the state without starting over.
-            </li>
-<li>
-<strong>Experimentation:</strong> You want to test a build, weapon, or playstyle
-              before committing dozens of hours to it.
-            </li>
-<li>
-<strong>Time respect:</strong> You have limited play time and want to focus on the
-              parts of the game you enjoy, not the grind.
-            </li>
-<li>
-<strong>Accessibility:</strong> Some players use save editing to adjust difficulty
-              or remove barriers that make the game less enjoyable for them.
-            </li>
-</ul>
-<p>
-            We believe save editing is a legitimate way to engage with single‑player games. It is
-            your save file, on your machine, and your experience. Our role is to make the process
-            transparent and safe, not to judge why you want to use it.
-          </p>
-</div>
-</div>
-</section>
-
-<!-- Safety and ethics -->
-<section>
-<div class="wrap">
-<h2>Safety, Ethics, and Responsible Editing</h2>
-<div class="grid cols-2 safety-grid">
-<div class="card icon-card">
-<h3>Always back up first</h3>
-<p>
-              This cannot be said enough: copy your original save file to a separate folder before
-              you edit. If the game updates, if the editor misreads a value, or if you simply change
-              your mind, the backup is your safety net.
-            </p>
-</div>
-<div class="card icon-card">
-<h3>Single‑player only</h3>
-<p>
-              Save editing is intended for single‑player, offline experiences. Using edited saves in
-              multiplayer modes can violate the game’s terms of service, disrupt other players, or
-              trigger anti‑cheat systems. We do not support or encourage that use.
-            </p>
-</div>
-<div class="card icon-card">
-<h3>Respect the developers</h3>
-<p>
-              Save editing is not about piracy or bypassing payments. It is about modifying a file
-              you already own, for a game you already bought. If you enjoy a game, support the
-              developers by buying it legitimately and recommending it to others.
-            </p>
-</div>
-<div class="card icon-card">
-<h3>Understand the limits</h3>
-<p>
-              Not every value is safe to change. Some games use checksums, encrypted sections, or
-              server‑side validation. Our editor will warn you when a file appears to use these
-              protections, but no tool can guarantee compatibility with every game version. If a
-              game receives a major update, wait for compatibility notes before editing.
-            </p>
-</div>
-</div>
-<div class="note">
-<strong>Transparency:</strong> We publish known limitations and compatibility updates
-          on our <a href="/blog">blog</a>. If you are unsure whether a specific edit is safe,
-          ask in the comments or <a href="/contact">contact us</a> before applying it.
-        </div>
-</div>
-</section>
-
-<!-- Comparison / why us -->
-<section class="alt">
-<div class="wrap">
-<h2>Why Choose Save Editor Over Other Tools?</h2>
-<div class="prose">
-<p>
-            There is no shortage of save editors, cheat engines, and modding tools. Here is how we
-            approach the problem differently.
-          </p>
-</div>
-<div class="grid cols-4 why">
-<div class="card icon-card">
-<h3>Browser‑first, not install‑first</h3>
-<p>
-              Many save editors require you to download an executable from an unknown source. We
-              run in your browser, which means fewer permissions, easier updates, and no leftover
-              files on your system.
-            </p>
-</div>
-<div class="card icon-card">
-<h3>Safety is a feature, not an afterthought</h3>
-<p>
-              We build reversible edits, clear warnings, and backup reminders into the workflow.
-              A tool that lets you edit without understanding the risk is not helping you.
-            </p>
-</div>
-<div class="card icon-card">
-<h3>No dark patterns</h3>
-<p>
-              The core editor is free. We do not hide basic functionality behind a paywall, and we
-              do not require an account to edit a file. If we add premium features in the future,
-              they will be clearly optional.
-            </p>
-</div>
-<div class="card icon-card">
-<h3>Documentation you can actually read</h3>
-<p>
-              Our <a href="/blog">blog</a> explains how save files work, what different data types
-              mean, and how to troubleshoot common issues. We want you to understand what you are
-              doing, not just click buttons.
-            </p>
-</div>
-</div>
-</div>
-</section>
-
-<!-- FAQ -->
-<section>
-<div class="wrap">
-<h2>Frequently Asked Questions</h2>
-<div class="prose" style="margin-top: 8px;">
-<details class="faq-item" open="">
-<summary>Is Save Editor really free?</summary>
-<p>
-              Yes. The core save editing features are free to use. You do not need an account, a
-              subscription, or a credit card. We may introduce optional premium features later, but
-              basic editing will remain available at no cost.
-            </p>
-</details>
-<details class="faq-item">
-<summary>Will editing my save get me banned?</summary>
-<p>
-              In single‑player games, save editing is generally not a bannable offense because
-              there is no multiplayer server to enforce rules. However, using edited saves in
-              multiplayer or online modes can violate terms of service and may lead to penalties.
-              Always keep edits offline.
-            </p>
-</details>
-<details class="faq-item">
-<summary>Do you store my save files?</summary>
-<p>
-              Whenever technically possible, processing happens locally in your browser. We do not
-              permanently store your save files on our servers, and we do not share them with third
-              parties. See our <a href="/privacy">privacy policy</a> for details.
-            </p>
-</details>
-<details class="faq-item">
-<summary>What if my game is not supported?</summary>
-<p>
-              Check the <a href="/blog">blog</a> for the current compatibility list. If your game
-              is not listed, you can <a href="/contact">contact us</a> and request it. We prioritize
-              games based on demand and technical feasibility.
-            </p>
-</details>
-<details class="faq-item">
-<summary>Can I undo an edit?</summary>
-<p>
-              Yes — if you kept a backup of your original save, you can always restore it. Within
-              the editor, reversible changes are held in your session so you can undo before
-              downloading. Once you overwrite the original file without a backup, recovery may not
-              be possible.
-            </p>
-</details>
-<details class="faq-item">
-<summary>Is save editing legal?</summary>
-<p>
-              Modifying a save file on your own device for a game you legally own is generally
-              lawful in most jurisdictions. It may violate a game’s end‑user license agreement in
-              some cases, especially if used online. We encourage responsible, offline use. This is
-              not legal advice; consult a professional if you have specific concerns.
-            </p>
-</details>
-</div>
-</div>
-</section>
-
-<!-- Closing / CTA -->
-<section style="padding-bottom: 120px;">
-<div class="wrap">
-<div class="cta-panel">
-<h2>Take Control of Your Save Files</h2>
-<p>
-            Whether you are recovering from a bug, testing a build, or simply playing the game on
-            your own terms, Save Editor gives you a clean, safe, and fast way to edit your saves.
-            No install. No account. Just your file, your rules.
-          </p>
-<div class="hero-actions">
-<a class="btn" href="#upload-box">Upload a Save File</a>
-<a class="btn secondary" href="/about">Learn About Us</a>
-</div>
-</div>
-</div>
-</section>
-`;
-
 const HOME_HTML = `
 <header class="hero">
   <div class="wrap">
-    <span class="badge">Free · Browser‑based · No install · Secure Encryption</span>
-    <h1>Free Online Game Save Editor — Edit &amp; Modify Saves Instantly</h1>
-    <p>Save Editor is a powerful, free online tool that lets you modify game save files in seconds. Change money, items, skills, levels, and inventory stats — without risking your game progress. Built for PC, console, and handheld players who want total control, maximum speed, and complete peace of mind.</p>
+    <span class="badge">Free · Browser-based · No account required</span>
+    <h1>Contribute Game Save Files to Help Build a Universal Save Editor</h1>
+    <p>EditorSaves is collecting real game save files to research how different games store progress, inventory, quests, and other player data. This research will guide development of a future universal game save editor.</p>
     <div class="hero-actions">
-      <a class="btn" href="#upload-box">Upload file now</a>
-      <a class="btn secondary" href="/blog">Blog &amp; Guides</a>
+      <a class="btn" href="#upload-box">Contribute a save file</a>
+      <a class="btn secondary" href="/about">How the project works</a>
     </div>
+    <p class="hero-note">Current status: file collection and format research. Parsing, editing, and exporting saves are not available yet.</p>
   </div>
 </header>
 
@@ -476,10 +40,9 @@ const HOME_HTML = `
   <div class="wrap">
     <div class="upload-container" id="upload-box">
       <div class="upload-topline" aria-hidden="true">
-        <span class="upload-topline-pill"><span class="upload-topline-spark"></span> Secure save-file collection</span>
+        <span class="upload-topline-pill"><span class="upload-topline-spark"></span> Save-file research collection</span>
         <span class="upload-background-note"><span class="upload-background-dot"></span> Background security check</span>
       </div>
-      <p>Supported Formats: .SAV, .JSONSAVE, .DAT, .SVII, .GCI, .SRAM</p>
       <div class="upload-art" aria-hidden="true">
         <span class="upload-art-ring upload-art-ring-one"></span>
         <span class="upload-art-ring upload-art-ring-two"></span>
@@ -488,150 +51,142 @@ const HOME_HTML = `
         <span class="upload-floating-tag upload-floating-tag-two">.JSON</span>
         <span class="upload-floating-tag upload-floating-tag-three">SAVE</span>
       </div>
-      <h3>Upload your save file</h3>
-      <p>Drag &amp; drop your save file here, or click to browse</p>
+      <h2>Contribute a game save file</h2>
+      <p>Select a save file from a game you are allowed to share, or drag it into this area.</p>
       <input accept=".rpgsave,.rmmzsave,.save,.rvdata2,.rvdata,.rxdata,.sav,.dat,.json,.xml,.sqlite,.db,.plr,.wld,.rsv,.sol,.sgs,.qsp,.ksd,.pkl,.pickle,.es3,.lsd" aria-label="Choose a game save file" class="file-input" id="save-file" name="file" type="file" />
       <div class="upload-select-row">
-        <label aria-controls="save-file" class="btn" for="save-file" role="button" tabindex="0">Select File</label>
+        <label aria-controls="save-file" class="btn" for="save-file" role="button" tabindex="0">Choose save file</label>
         <span class="upload-select-hint">or drop it anywhere in this box</span>
       </div>
       <div aria-live="polite" data-state="idle" hidden="" id="esUploadStatus" role="status"></div>
       <div aria-label="Security verification" id="turnstileMount"></div>
       <div class="upload-trustline" aria-hidden="true">
-        <span class="upload-trustline-item"><svg viewBox="0 0 24 24"><path d="M7 10V7a5 5 0 0 1 10 0v3"/><rect x="4" y="10" width="16" height="11" rx="2"/><path d="m9 15 2 2 4-4"/></svg> Secure SSL upload</span>
+        <span class="upload-trustline-item"><svg viewBox="0 0 24 24"><path d="M7 10V7a5 5 0 0 1 10 0v3"/><rect x="4" y="10" width="16" height="11" rx="2"/><path d="m9 15 2 2 4-4"/></svg> Private file storage</span>
         <span class="upload-trustline-divider"></span>
         <span class="upload-trustline-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></svg> No account required</span>
-        <span class="upload-trustline-divider"></span>
-        <span class="upload-trustline-item">Processed locally in browser</span>
+      </div>
+      <p class="upload-footnote">An accepted file extension only means the upload passes the current intake filter. It does not mean EditorSaves can read or edit that game's save format.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap prose">
+    <h2>What Is EditorSaves?</h2>
+    <p>EditorSaves is an independent game save-file research project with a long-term goal: make save editing more understandable, reliable, and accessible through a future universal save editor. The project starts with real-world file collection because game saves are not interchangeable. Two games can use the same filename extension while storing completely different data internally.</p>
+    <p>Games may use JSON, XML, SQLite, serialized objects, binary records, compression, custom encodings, checksums, or proprietary containers. An extension can offer a clue, but it cannot reliably identify the complete format or prove that a file can be edited safely.</p>
+    <div class="highlight-block">
+      <p><strong>What the live website does today:</strong> EditorSaves accepts eligible save-file submissions, performs basic intake and security checks, calculates a SHA-256 file hash, and stores the submission in private project storage for research. The current release does not inspect file contents for visitors, change game values, or generate an edited download.</p>
+    </div>
+  </div>
+</section>
+
+<section class="alt" id="how-it-works">
+  <div class="wrap">
+    <h2>How the Save-File Collection Works</h2>
+    <p class="section-lead">The current workflow is deliberately limited and transparent. Submitting a sample contributes to research; it does not start an editing session.</p>
+    <div class="grid cols-3">
+      <div class="card">
+        <span class="badge">Step 1</span>
+        <h3>Choose a save file</h3>
+        <p>Find a save file created by a game you own or are otherwise authorized to share. Keep a separate copy on your device and submit only a file that does not contain information you want to keep private.</p>
+      </div>
+      <div class="card">
+        <span class="badge">Step 2</span>
+        <h3>Complete the intake checks</h3>
+        <p>The upload service checks file size and filename extension, verifies a Cloudflare Turnstile token on the server, and calculates a SHA-256 hash to help identify duplicate file contents.</p>
+      </div>
+      <div class="card">
+        <span class="badge">Step 3</span>
+        <h3>Contribute to format research</h3>
+        <p>Eligible submissions are stored in private project storage with associated upload metadata. Samples can help investigate serialization, compression, version differences, and other format characteristics.</p>
       </div>
     </div>
   </div>
 </section>
 
 <section>
-  <div class="wrap">
-    <h2>Supported Platforms &amp; Ecosystems</h2>
-    <div class="prose">
-      <p>Our browser-based engine supports save files generated across all major gaming platforms:</p>
-      <ul>
-        <li>PC Games: Steam Cloud, Epic Games Store, GOG, Xbox App for Windows (.sav, .dat, .json)</li>
-        <li>Nintendo Switch: JKSV and Checkpoint homebrew save dumps</li>
-        <li>PlayStation &amp; Xbox: Decrypted legacy console save files</li>
-        <li>Emulators: RetroArch, RPCS3, Yuzu, Ryujinx, PCSX2 save states</li>
-      </ul>
-    </div>
+  <div class="wrap prose">
+    <h2>Which Game Save File Extensions Can You Submit?</h2>
+    <p>The current intake filter accepts the filename extensions below. This list describes upload eligibility only. It is not a supported-editor list, compatibility matrix, or promise that every file with one of these extensions can be decoded.</p>
+    <h3>Engine-associated and game-specific extensions</h3>
+    <p><code>.rpgsave</code>, <code>.rmmzsave</code>, <code>.rvdata</code>, <code>.rvdata2</code>, <code>.rxdata</code>, <code>.lsd</code>, <code>.rsv</code>, <code>.sol</code>, <code>.sgs</code>, <code>.qsp</code>, <code>.ksd</code>, <code>.plr</code>, and <code>.wld</code>.</p>
+    <h3>General and structured-data extensions</h3>
+    <p><code>.sav</code>, <code>.save</code>, <code>.dat</code>, <code>.json</code>, <code>.xml</code>, <code>.sqlite</code>, <code>.db</code>, <code>.pkl</code>, <code>.pickle</code>, and <code>.es3</code>.</p>
+    <p>Some games use the same extension for unrelated formats. Others use a familiar extension but wrap the data in compression or a game-specific container. The actual format must be identified from file contents and context, not the extension alone.</p>
   </div>
 </section>
 
 <section class="alt">
-  <div class="wrap prose">
-    <h2>What Is a Save Editor — and Why Do You Need One?</h2>
-    <p>A save editor is a specialized web tool that reads, decodes, and modifies the raw hex data and variable structures inside video game save files. Every time you play an offline or single-player game, it stores your progress — your character’s level, inventory arrays, in‑game currency values, quest flags, and world states — in a local file. A save editor gives you direct, structured access to that data so you can safely manipulate it.</p>
-    <p>Whether you want to recover from a corrupted save file, experiment with late-game builds you would not normally try, or simply skip the repetitive grinding after a long day, a web-based save editor puts control back in your hands. Unlike real-time memory editors (like Cheat Engine) or risky trainers, a save editor works directly on the offline file static data. It does not hook into your game’s active running process, making it completely clean, virus-free, and safe from anti-cheat flags when used correctly.</p>
-    <p>Our universal Save Editor is designed to be approachable for beginners and powerful enough for advanced modders. It runs entirely client-side in your browser via JavaScript WebAssembly. There is nothing to install, no sketchy executable .exe files to trust, and no background processes stealing your system resources. You simply upload your save file, adjust your variables, and download the edited file instantly.</p>
-    <div class="note"><strong>Important Safety Warning:</strong> Always create a backup copy of your original save file before editing. Even the most robust parsing tools can produce unexpected game crashes if an entered value exceeds the maximum variable limit (e.g., 32-bit integer limits) expected by the game engine. A simple copy‑paste of your save folder takes seconds and protects hours of gameplay.</div>
-  </div>
-</section>
-
-<section id="how-it-works">
   <div class="wrap">
-    <h2>How the Save Editor Works — Three Simple Steps</h2>
-    <p class="section-lead">You do not need to be a programmer, hexadecimal expert, or game modder. Our automated workflow is completely streamlined, and every change is reversible as long as you keep your original backup.</p>
+    <h2>Why Real Save-File Samples Matter</h2>
+    <p class="section-lead">Reliable format support starts with evidence. Samples can expose differences that a generic extension list or engine name cannot describe.</p>
     <div class="grid cols-3">
-      <div class="card"><span class="badge">Step 1</span><h3>Upload your save file</h3><p>Locate your game’s local save directory (refer to our database of save file locations for popular PC and console titles) and upload the file. The parser automatically reads the file structure and displays the editable string values, item IDs, and integer fields it recognizes.</p></div>
-      <div class="card"><span class="badge">Step 2</span><h3>Modify your stats and inventory</h3><p>Adjust money, gold, credits, experience points (XP), skill points, attribute configurations, and unlocked items. You will see the exact values before you commit your modifications — completely removing the guesswork.</p></div>
-      <div class="card"><span class="badge">Step 3</span><h3>Download and replace</h3><p>Export the newly compiled, edited save file, drop it back into your platform's designated save data directory, and launch your game. Your modifications will be applied immediately. If anything looks wrong or the game fails to load, simply restore your original backup file.</p></div>
+      <article class="card icon-card"><h3>Serialization and structure</h3><p>Research can reveal whether a game stores data as JSON, XML, SQLite, serialized objects, binary records, or a custom structure—and how fields relate to one another.</p></article>
+      <article class="card icon-card"><h3>Compression and encoding</h3><p>A save may contain compressed, encoded, or wrapped data. Understanding those layers is necessary before a future tool can safely inspect or rewrite the contents.</p></article>
+      <article class="card icon-card"><h3>Game and version differences</h3><p>Updates can change field layouts, identifiers, checksums, and serialization behavior. Samples from different games and versions help distinguish shared patterns from game-specific rules.</p></article>
+      <article class="card icon-card"><h3>Validation requirements</h3><p>Future parsers will need tests that detect malformed data and preserve important structures. A file that can be read is not automatically safe to rewrite.</p></article>
+      <article class="card icon-card"><h3>Honest compatibility reporting</h3><p>Long-term support should be documented per game and format, including tested versions, known limitations, and workflows that are not yet editable.</p></article>
+      <article class="card icon-card"><h3>Better development priorities</h3><p>Understanding which games, formats, and variations appear in real submissions helps prioritize future research instead of guessing from extensions alone.</p></article>
     </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap prose">
+    <h2>Privacy, File Safety, and Responsible Contributions</h2>
+    <p>Save files may contain player names, progression details, profile identifiers, or other information that is not obvious from the filename. Only submit files you have permission to share. Do not upload account credentials, private documents, or data belonging to someone else without permission.</p>
+    <p>Submitted files are uploaded to a private Supabase Storage bucket, and the project records metadata needed to manage and research submissions. Cloudflare Turnstile is used as an anti-abuse check. These controls do not guarantee that an uploaded file is harmless or that its contents have been fully inspected.</p>
+    <p>Keep your original save file on your own device. EditorSaves does not modify the original file in your game folder, and the current website does not return a modified save. For details about collected metadata, storage, and retention, read the <a href="/privacy">EditorSaves Privacy Policy</a>. The <a href="/terms">Terms of Use</a> explain what you may submit and your responsibilities.</p>
+    <div class="note"><strong>Important:</strong> Upload only a copy of a save file you are authorized to provide. Do not rely on EditorSaves as the only copy of valuable game progress.</div>
   </div>
 </section>
 
 <section class="alt">
   <div class="wrap">
-    <h2>Everything You Need in a Web-Based Modding Tool</h2>
-    <p class="section-lead">We engineered this platform around the explicit features gamers actually use, avoiding bloated scripts and broken options.</p>
-    <div class="grid cols-2">
-      <div class="card icon-card"><h3>Automated Value Detection</h3><p>The editor recognizes standard data types, hashes, and checksums, highlighting fields that are completely safe to modify. You do not need to read hex offsets or manually calculate offsets.</p></div>
-      <div class="card icon-card"><h3>Privacy-First Client Execution</h3><p>Your save file is processed locally within your sandbox browser window. Your private gaming files are never uploaded to a permanent cloud server, ensuring total privacy.</p></div>
-      <div class="card icon-card"><h3>Non-Destructive Session Backups</h3><p>Before rewriting any bytes, the tool preserves a clean copy of the initial state in your temporary browser session, allowing a one-click undo.</p></div>
-      <div class="card icon-card"><h3>Universal Engine Support</h3><p>We actively update our parsing dictionary to support major engines, including Unreal Engine save files, Unity serialization, RPG Maker saves, and custom binary formats.</p></div>
-      <div class="card icon-card"><h3>Zero Bloatware or Paywalls</h3><p>No desktop apps to install, no intrusive browser extensions demanding system permissions, and no locked premium tier. The core editor is 100% free.</p></div>
-      <div class="card icon-card"><h3>Complete Modding Documentation</h3><p>New to save file hacking? Our blog provides deep-dive walkthroughs, game-specific ID tables, and troubleshooting steps for checksum errors.</p></div>
+    <h2>EditorSaves Development Roadmap</h2>
+    <p class="section-lead">The long-term goal is a dependable universal game save editor. Each stage must be built and tested before the site describes it as an available feature.</p>
+    <div class="grid cols-3">
+      <article class="card"><span class="badge">Current stage</span><h3>Collection and research</h3><p>Collect eligible samples, verify submissions, maintain private storage, identify duplicate contents, and organize evidence about game and format diversity.</p></article>
+      <article class="card"><span class="badge">Planned work</span><h3>Format identification and parsers</h3><p>Investigate file signatures, compression, serialization, and game-specific structures. Build automated test fixtures and document what can be identified reliably.</p></article>
+      <article class="card"><span class="badge">Long-term goal</span><h3>Validated editing and export</h3><p>Develop game-aware editing workflows with backups, validation, clear compatibility limits, and safe export only after each supported format has been tested.</p></article>
     </div>
   </div>
 </section>
 
 <section>
   <div class="wrap">
-    <h2>What Can You Edit — and Which Games Are Supported?</h2>
-    <div class="prose"><p>Save Editor is built on a modular parsing framework that adapts to distinct game genres. The breakdown below details the data classes we decode most reliably. For a comprehensive index of specific game configurations, visit our active Compatibility Database.</p></div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Data Category</th><th>Variables You Can Change</th><th>Typical Modding Use Case</th></tr></thead>
-        <tbody>
-          <tr><td>Currency &amp; Resources</td><td>Gold, Credits, Tech Points, Gems, Crafting Mats</td><td>Skip repetitive resource farming; instantly recover from bad in-game purchases.</td></tr>
-          <tr><td>Character Progression</td><td>Level, XP Pools, Paragon Levels, Skill Trees, Attributes</td><td>Test max-level builds and alternate classes without committing to a 60-hour replay.</td></tr>
-          <tr><td>Inventory &amp; Gear</td><td>Item Quantities, Weapon Durability, Rarity Flags, Unlocks</td><td>Replace lost or glitched quest items; inject rare armor or specific weapon mods.</td></tr>
-          <tr><td>Quest &amp; World State</td><td>Quest Stages, Faction Rep, Discovered Nodes, Event Triggers</td><td>Repair broken quest lines caused by game bugs or sequence breaking.</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
-
-<section class="alt">
-  <div class="wrap prose">
-    <h2>Common Reasons Players Use a Save Editor</h2>
-    <ul>
-      <li><strong>Bug &amp; Glitch Recovery:</strong> A game-breaking bug made an essential quest item disappear, a save state corrupted during an autosave, or an essential NPC is stuck under the map. Modifying the raw save file lets you repair these states manually.</li>
-      <li><strong>Sandbox Experimentation:</strong> Test end-game builds, hidden weapons, or radical playstyles before dedicating dozens of hours of natural progression to them.</li>
-      <li><strong>Time Preservation:</strong> Respect your personal schedule by cutting out tedious, artificial grinding loops so you can focus entirely on story campaigns and core mechanics.</li>
-      <li><strong>Custom Accessibility:</strong> Adjust underlying difficulty scaling, modify stamina depletion variables, or eliminate barriers that hinder your physical enjoyment of single-player titles.</li>
-    </ul>
-    <p>We firmly believe save editing is a legitimate way to experience single-player video games. It is your hardware, your file, and your personal experience. Our objective is to make file editing transparent, safe, and open to everyone.</p>
-  </div>
-</section>
-
-<section>
-  <div class="wrap prose">
-    <h2>Safety, Ethics, and Responsible Game Editing</h2>
-    <ul>
-      <li><strong>Backup Your Files First:</strong> Never skip this step. Keep an unedited backup in a separate folder. If a game receives a sudden developer patch or an invalid value causes an internal crash, your backup is your ultimate safety net.</li>
-      <li><strong>Strict Single-Player Focus:</strong> Save editing is built exclusively for offline, single-player environments. Applying modified saves to multiplayer ecosystems or online servers violates terms of service (ToS), ruins matchmaking balance, and will trigger permanent anti-cheat bans (such as Valve Anti-Cheat or Easy Anti-Cheat). We do not support online modifications.</li>
-      <li><strong>Support Game Creators:</strong> Save editing is a post-purchase customization hobby, not a tool for digital piracy. Always support game developers by purchasing your games legitimately.</li>
-      <li><strong>Technical Boundaries:</strong> Some titles implement server-side validation, complex custom encryption, or strict file checksums. Our editor detects these parameters and alerts you, but compatibility cannot be guaranteed for every patch version.</li>
-    </ul>
-  </div>
-</section>
-
-<section class="alt">
-  <div class="wrap prose">
-    <h2>Why Use Our Web Tool Over Offline Save Editors?</h2>
-    <ul>
-      <li><strong>Instant Browser Loading:</strong> Most tools require downloading risky .exe software from unverified forums. Our interface runs instantly in any browser window, ensuring no malware risk, no installation steps, and seamless cross-platform updates.</li>
-      <li><strong>Guided Hex Rewriting:</strong> Traditional hex editors require you to search for exact bite offsets manually. Our platform translates those complex structures into readable, labeled fields.</li>
-      <li><strong>No Account Required:</strong> We do not collect your personal data, track your gaming profiles, or force you to register an account just to download your modified file.</li>
-    </ul>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <h2>Frequently Asked Questions</h2>
+    <h2>Frequently Asked Questions About EditorSaves</h2>
     <div class="prose" style="margin-top: 8px;">
-      <details class="faq-item" open=""><summary>Is Save Editor really free?</summary><p>Yes. The core file parsing and data modification tools are completely free to use. There are no registration forms, no subscription fees, and no credit cards required.</p></details>
-      <details class="faq-item"><summary>What formats are supported?</summary><p>Our engine natively parses standard PC, emulator, and console formats including .sav, .json, .jsonview, .dat, .savsave, and text-serialized arrays.</p></details>
-      <details class="faq-item"><summary>Can editing break my game?</summary><p>If you enter an invalid value that conflicts with the game engine's maximum allowed limits, the game may crash on launch. This is why keeping an unedited backup file is mandatory before using any save editor tool.</p></details>
+      <details class="faq-item" open=""><summary>Can I edit a game save on EditorSaves right now?</summary><p>Not yet. The current live release is a save-file collection service for format research. It does not parse save contents for visitors, change money or inventory, or export modified files. Editing features will only be described as available after they are implemented and tested.</p></details>
+      <details class="faq-item"><summary>Does an accepted file extension mean my game is supported?</summary><p>No. The extension list is an intake filter, not a compatibility guarantee. Different games can use the same extension for different internal formats, and some files need game-specific decompression, decoding, or validation.</p></details>
+      <details class="faq-item"><summary>Will uploading a save change or overwrite my original file?</summary><p>No. The website receives an uploaded copy. It does not write to your game folder or modify the original file on your device. Keep your own backup and original copy.</p></details>
+      <details class="faq-item"><summary>Do I need an account or payment to contribute?</summary><p>No account or payment is currently required to submit an eligible research sample. The upload flow includes an automated security check and intake validation.</p></details>
+      <details class="faq-item"><summary>Where are uploaded files stored?</summary><p>Eligible files are stored in private project storage, with database metadata used to manage submissions. Read the <a href="/privacy">Privacy Policy</a> for the current data-handling and retention details.</p></details>
+      <details class="faq-item"><summary>Can you guarantee that my file will be supported by the future editor?</summary><p>No. A submission helps with research but does not guarantee compatibility or a future parser. Support depends on the game's format, versions, encryption, compression, and whether reliable editing can be validated.</p></details>
     </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap prose">
+    <h2>Questions or a Game Format to Suggest?</h2>
+    <p>Tell us which game or save format you are interested in. Suggestions help us understand what players want researched, but they are not a promise of a release date or compatibility.</p>
+    <p>Contact the project at <a href="mailto:contact@editorsaves.com">contact@editorsaves.com</a> or visit the <a href="/about">About EditorSaves</a> page to learn more about the research approach.</p>
   </div>
 </section>
 `;
 
 function ensureTurnstileLoaded(): Promise<TurnstileInstance> {
   if (window.turnstile) return Promise.resolve(window.turnstile);
+
   const existing = document.querySelector<HTMLScriptElement>('script[data-editorsaves-turnstile]');
   if (existing) {
     return new Promise((resolve, reject) => {
-      const timeout = window.setTimeout(() => reject(new Error('Security verification could not be loaded.')), 15000);
+      const timeout = window.setTimeout(
+        () => reject(new Error('Security verification could not be loaded.')),
+        15000,
+      );
       const poll = window.setInterval(() => {
         if (!window.turnstile) return;
         window.clearTimeout(timeout);
@@ -640,13 +195,16 @@ function ensureTurnstileLoaded(): Promise<TurnstileInstance> {
       }, 50);
     });
   }
+
   return new Promise((resolve, reject) => {
     const script = document.createElement('script');
     script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
     script.async = true;
     script.defer = true;
     script.dataset.editorsavesTurnstile = 'true';
-    script.onload = () => window.turnstile ? resolve(window.turnstile) : reject(new Error('Security verification loaded without its API.'));
+    script.onload = () => window.turnstile
+      ? resolve(window.turnstile)
+      : reject(new Error('Security verification loaded without its API.'));
     script.onerror = () => reject(new Error('Security verification could not be loaded.'));
     document.head.appendChild(script);
   });

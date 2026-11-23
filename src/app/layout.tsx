@@ -1,40 +1,18 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, JetBrains_Mono, Space_Grotesk } from 'next/font/google';
 import type { ReactNode } from 'react';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
-import { SITE_URL } from '@/lib/constants';
-
-const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-inter',
-  weight: ['300', '400', '500', '600', '700', '800', '900'],
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-jetbrains',
-  weight: ['400', '500', '600'],
-});
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-space',
-  weight: ['400', '500', '600', '700'],
-});
+import { SITE_DESCRIPTION, SITE_URL } from '@/lib/constants';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Free Online Game Save Editor — Edit & Modify Saves Instantly',
+    default: 'Game Save File Research for a Future Save Editor',
     template: '%s | EditorSaves'
   },
-  description: 'Modify gold, items, stats, and variables in your game save files directly in your browser. No downloads, no installations.',
+  description: SITE_DESCRIPTION,
   alternates: { canonical: SITE_URL }
 };
 
@@ -46,7 +24,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en">
       <body>
         <Navbar />
         <main>{children}</main>

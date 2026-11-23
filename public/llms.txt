@@ -1,29 +1,28 @@
 # EditorSaves
 
-> Universal save editor for game saves — RPG Maker, Ren'Py, Unity, Unreal Engine, and 23+ formats. Free, browser-based, no installation required.
+> EditorSaves is a game save-file collection and format-research project working toward a future universal game save editor.
 
-EditorSaves is building a universal game save editor that works across many game engines and save formats. During Phase 1, the project collects real save files for format research while developing the editing system.
+## Current product status
 
-## Key Pages
+The live website currently provides a save-file submission workflow. It validates the filename extension and file size, verifies an anti-abuse token on the server, calculates a SHA-256 content hash, stores eligible submissions in a private Supabase Storage bucket, and records upload metadata.
 
-- [Homepage](https://editorsaves.com/): Upload save files and learn about the universal save editor.
-- [About](https://editorsaves.com/about): The mission and approach behind EditorSaves.
-- [Blog](https://editorsaves.com/blog): Save file guides and format explanations.
-- [Contact](https://editorsaves.com/contact): Get in touch with EditorSaves.
+The current release does **not** parse save contents for visitors, modify money or inventory, edit game progress, or export modified save files. An accepted filename extension is an intake rule, not a claim that the format or game is currently editable.
 
-## Supported Formats
+## Main pages
 
-- RPG Maker MV/MZ: `.rpgsave`, `.rmmzsave`
-- RPG Maker VX Ace/XP: `.rvdata2`, `.rxdata`
-- Ren'Py: `.save`
-- Unity: `.es3`, `.xml`, `.json`
-- Unreal Engine: `.sav`
-- SQLite: `.db`, `.sqlite3`
-- JSON, XML, MessagePack, CBOR, Protocol Buffers, plist
-- Python Pickle: `.pkl`
-- Ruby Marshal: `.rxdata`
-- Game-specific: Terraria (`.plr`, `.wld`), The Witcher 3 (`.sav`)
+- [Homepage](https://editorsaves.com/): Contribute eligible game save files to format research.
+- [About](https://editorsaves.com/about): Project mission and research approach.
+- [Contact](https://editorsaves.com/contact): Contact the project.
+- [Privacy Policy](https://editorsaves.com/privacy): Data collection, storage, and retention information.
+- [Terms of Use](https://editorsaves.com/terms): Upload rules and service limitations.
+- [Blog](https://editorsaves.com/blog): Placeholder for future articles; no published articles are currently available.
 
-## Research Focus
+## Filename extensions accepted by the current upload intake
 
-EditorSaves studies how save files are serialized, compressed, and encoded across different engines to build reliable, safe editing tools. The project prioritizes accuracy, backups, and user control over broad claims.
+.rpgsave, .rmmzsave, .save, .rvdata2, .rvdata, .rxdata, .sav, .dat, .json, .xml, .sqlite, .db, .plr, .wld, .rsv, .sol, .sgs, .qsp, .ksd, .pkl, .pickle, .es3, .lsd.
+
+These extensions are accepted by the current intake filter only. Actual format identification and editor compatibility have not been implemented for the live product. Different games can use the same extension with unrelated internal structures.
+
+## Research direction
+
+The project intends to study save-file structure, serialization, compression, encoding, game and version differences, and validation requirements. Future editor support should be reported per game and format with tested limitations rather than inferred from the filename extension.

@@ -34,7 +34,7 @@ export default function PrivacyPage() {
             <div className="legal-note">Phase 1 stores uploaded files for format research and parser development. Do not upload a save that contains personal, confidential, or otherwise sensitive information you do not want to provide to the project.</div>
 
             <h2>1. Information we receive</h2>
-            <p>When you submit a supported save file, the upload service receives the file itself and basic metadata associated with the upload. The current database record can include the original filename, storage path, file size, MIME type, upload timestamp, IP address when the server can determine it, and an internal status value.</p>
+            <p>When you submit a supported save file, the upload service receives the file itself and basic metadata associated with the upload. The current database record can include the original filename, storage path, file size, MIME type, upload timestamp, IP address when the server can determine it, a SHA-256 file hash used to identify duplicate file contents, an optional game title when provided, and internal workflow status.</p>
             <p>Cloudflare Turnstile is used as an anti-abuse control. The upload server sends the verification token to Cloudflare's verification service before accepting a file.</p>
 
             <h2>2. How files are stored</h2>
@@ -44,7 +44,7 @@ export default function PrivacyPage() {
             <p>EditorSaves is being developed as a universal save editor. Real files help the project understand format differences, versions, schemas, compression, and edge cases that cannot be reliably inferred from filenames alone.</p>
 
             <h2>4. Retention</h2>
-            <p>The project intends to retain uploaded files for up to 30 days during the initial research phase, after which files can be deleted. Retention behavior may evolve as the service changes; the current upload system does not promise indefinite storage.</p>
+            <p>The project's current target is to retain raw uploaded save files for no longer than 30 days during the initial research phase. This is a target rather than a guaranteed automatic deletion deadline: an automated expiry-and-deletion schedule has not yet been verified as active. Do not rely on a file being removed automatically on a particular day. To request a review of a submission, email contact@editorsaves.com with the approximate upload date and filename; do not attach the save file again. Related metadata may be retained separately for upload management, duplicate detection, abuse prevention, and research records.</p>
 
             <h2>5. Security</h2>
             <p>The service applies size and extension validation in the browser and again on the server. Files are stored under UUID-based paths, the bucket is private, and the Supabase service-role credential is server-only. These measures reduce accidental exposure but cannot make internet services risk-free.</p>

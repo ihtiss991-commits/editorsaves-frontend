@@ -448,7 +448,7 @@ export default function SaveEditorClient() {
                                   id={"field-" + field.id}
                                   className="save-editor-checkbox"
                                   type="checkbox"
-                                  checked={field.value}
+                                  checked={field.value === true}
                                   onChange={(event) => updateField(field, event.target.checked)}
                                   disabled={busy}
                                 />

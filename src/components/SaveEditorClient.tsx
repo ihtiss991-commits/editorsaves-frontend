@@ -53,6 +53,7 @@ export default function SaveEditorClient() {
   const workerRef = useRef<Worker | null>(null);
   const requestIdRef = useRef(0);
   const activeRequestRef = useRef(0);
+  const downloadFilenameRef = useRef("edited-save.rpgsave");
 
   const [workerReady, setWorkerReady] = useState(false);
   const [workerFailed, setWorkerFailed] = useState(false);
@@ -148,9 +149,7 @@ export default function SaveEditorClient() {
         const url = URL.createObjectURL(blob);
         const anchor = document.createElement("a");
         anchor.href = url;
-        anchor.download = fileSummary
-          ? outputFilename(fileSummary.name, parsedSave?.format ?? "rpg-maker-mv")
-          : "edited-save.rpgsave";
+        anchor.download = downloadFilenameRef.current;
         document.body.appendChild(anchor);
         anchor.click();
         anchor.remove();
@@ -181,7 +180,7 @@ export default function SaveEditorClient() {
       workerRef.current?.terminate();
       workerRef.current = null;
     };
-  }, [fileSummary, parsedSave]);
+  }, []);
 
   const resetEditor = () => {
     setInspection(null);
@@ -276,6 +275,10 @@ export default function SaveEditorClient() {
     setBusy(true);
     setNotice("Validating and encoding your edited save in the browser...");
     setNoticeKind("info");
+
+    downloadFilenameRef.current = fileSummary
+      ? outputFilename(fileSummary.name, parsedSave.format)
+      : (parsedSave.format === "rpg-maker-mv" ? "edited-save.rpgsave" : "edited-save.rmmzsave");
 
     const request: WorkerRequest = {
       id,

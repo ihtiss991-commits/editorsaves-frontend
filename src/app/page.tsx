@@ -3,9 +3,9 @@ import HomePageClient from '@/components/HomePageClient';
 import { SITE_URL } from '@/lib/constants';
 import './homepage.css';
 
-const title = 'Game Save File Research for a Future Save Editor | EditorSaves';
+const title = 'RPG Maker MV & MZ Save Editor Beta and Game Save Research | EditorSaves';
 const description =
-  'Contribute a game save file to EditorSaves research into save formats, compression, and game-specific data structures. Editing is not live yet.';
+  'Use the experimental browser-based RPG Maker MV and MZ editor for selected recognized slot saves, or contribute a save file for wider format research. Game compatibility remains limited.';
 const socialImage = `${SITE_URL}/opengraph-image`;
 
 export const metadata: Metadata = {
@@ -57,7 +57,7 @@ const structuredData = {
       about: { '@id': `${SITE_URL}/#organization` },
       primaryImageOfPage: { '@type': 'ImageObject', url: socialImage },
       datePublished: '2026-10-20',
-      dateModified: '2026-11-23',
+      dateModified: '2026-11-24',
       inLanguage: 'en'
     }
   ]

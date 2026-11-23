@@ -1,7 +1,7 @@
 export const SITE_URL = 'https://editorsaves.com';
 export const SITE_NAME = 'EditorSaves';
 export const SITE_DESCRIPTION =
-  'EditorSaves collects game save files for format research as it develops toward a future universal save editor. File submissions are for research; save editing is not yet available.';
+  'EditorSaves offers an experimental browser-based RPG Maker MV and MZ save editor for selected recognized slot saves, alongside a game save-file collection and format-research project. Compatibility remains limited.';
 
 // Maximum file size: 25MB
 export const MAX_FILE_SIZE = 25 * 1024 * 1024;

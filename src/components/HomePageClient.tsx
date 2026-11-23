@@ -31,8 +31,9 @@ const HOME_HTML = `
     <div class="hero-actions">
       <a class="btn" href="#upload-box">Contribute a save file</a>
       <a class="btn secondary" href="/about">How the project works</a>
+      <a class="btn secondary" href="/editor">Try the editor beta</a>
     </div>
-    <p class="hero-note">Current status: file collection and format research. Parsing, editing, and exporting saves are not available yet.</p>
+    <p class="hero-note">Current status: file collection and format research, with an experimental in-browser editor for recognized RPG Maker MV/MZ slot saves. Supported fields and game compatibility remain limited.</p>
   </div>
 </header>
 
@@ -73,7 +74,7 @@ const HOME_HTML = `
 <section>
   <div class="wrap prose">
     <h2>What Is EditorSaves?</h2>
-    <p>EditorSaves is an independent game save-file research project with a long-term goal: make save editing more understandable, reliable, and accessible through a future universal save editor. The project starts with real-world file collection because game saves are not interchangeable. Two games can use the same filename extension while storing completely different data internally.</p>
+    <p>EditorSaves is an independent game save-file research project with an experimental browser-based editor for selected RPG Maker MV/MZ slot saves. Its long-term goal is to make save editing more understandable, reliable, and accessible through a universal save editor. The project starts with real-world file collection because game saves are not interchangeable. Two games can use the same filename extension while storing completely different data internally.</p>
     <p>Games may use JSON, XML, SQLite, serialized objects, binary records, compression, custom encodings, checksums, or proprietary containers. An extension can offer a clue, but it cannot reliably identify the complete format or prove that a file can be edited safely.</p>
     <div class="highlight-block">
       <p><strong>What the live website does today:</strong> EditorSaves accepts eligible save-file submissions, performs basic intake and security checks, calculates a SHA-256 file hash, and stores the submission in private project storage for research. The current release does not inspect file contents for visitors, change game values, or generate an edited download.</p>
@@ -84,7 +85,7 @@ const HOME_HTML = `
 <section class="alt" id="how-it-works">
   <div class="wrap">
     <h2>How the Save-File Collection Works</h2>
-    <p class="section-lead">The current workflow is deliberately limited and transparent. Submitting a sample contributes to research; it does not start an editing session.</p>
+    <p class="section-lead">Choose the workflow that fits your goal: contribute a copy of a save file for research, or open the experimental editor with a local RPG Maker MV/MZ slot save.</p>
     <div class="grid cols-3">
       <div class="card">
         <span class="badge">Step 1</span>
@@ -108,7 +109,7 @@ const HOME_HTML = `
 <section>
   <div class="wrap prose">
     <h2>Which Game Save File Extensions Can You Submit?</h2>
-    <p>The current intake filter accepts the filename extensions below. This list describes upload eligibility only. It is not a supported-editor list, compatibility matrix, or promise that every file with one of these extensions can be decoded.</p>
+    <p>The current intake filter accepts the filename extensions below. This list describes upload eligibility, not broad editor compatibility. The experimental editor currently recognizes selected RPG Maker MV/MZ slot-save structures; other extensions remain research intake types.</p>
     <h3>Engine-associated and game-specific extensions</h3>
     <p><code>.rpgsave</code>, <code>.rmmzsave</code>, <code>.rvdata</code>, <code>.rvdata2</code>, <code>.rxdata</code>, <code>.lsd</code>, <code>.rsv</code>, <code>.sol</code>, <code>.sgs</code>, <code>.qsp</code>, <code>.ksd</code>, <code>.plr</code>, and <code>.wld</code>.</p>
     <h3>General and structured-data extensions</h3>
@@ -137,7 +138,7 @@ const HOME_HTML = `
     <h2>Privacy, File Safety, and Responsible Contributions</h2>
     <p>Save files may contain player names, progression details, profile identifiers, or other information that is not obvious from the filename. Only submit files you have permission to share. Do not upload account credentials, private documents, or data belonging to someone else without permission.</p>
     <p>Submitted files are uploaded to a private Supabase Storage bucket, and the project records metadata needed to manage and research submissions. Cloudflare Turnstile is used as an anti-abuse check. These controls do not guarantee that an uploaded file is harmless or that its contents have been fully inspected.</p>
-    <p>Keep your original save file on your own device. EditorSaves does not modify the original file in your game folder, and the current website does not return a modified save. For details about collected metadata, storage, and retention, read the <a href="/privacy">EditorSaves Privacy Policy</a>. The <a href="/terms">Terms of Use</a> explain what you may submit and your responsibilities.</p>
+    <p>Keep your original save file on your own device. The editor processes a local copy in your browser and downloads a separate edited file; it does not overwrite your original game save. Editing is limited to selected recognized RPG Maker MV/MZ slot fields. For details about collected metadata, storage, and retention, read the <a href="/privacy">EditorSaves Privacy Policy</a>. The <a href="/terms">Terms of Use</a> explain what you may submit and your responsibilities.</p>
     <div class="note"><strong>Important:</strong> Upload only a copy of a save file you are authorized to provide. Do not rely on EditorSaves as the only copy of valuable game progress.</div>
   </div>
 </section>
@@ -148,8 +149,8 @@ const HOME_HTML = `
     <p class="section-lead">The long-term goal is a dependable universal game save editor. Each stage must be built and tested before the site describes it as an available feature.</p>
     <div class="grid cols-3">
       <article class="card"><span class="badge">Current stage</span><h3>Collection and research</h3><p>Collect eligible samples, verify submissions, maintain private storage, identify duplicate contents, and organize evidence about game and format diversity.</p></article>
-      <article class="card"><span class="badge">Planned work</span><h3>Format identification and parsers</h3><p>Investigate file signatures, compression, serialization, and game-specific structures. Build automated test fixtures and document what can be identified reliably.</p></article>
-      <article class="card"><span class="badge">Long-term goal</span><h3>Validated editing and export</h3><p>Develop game-aware editing workflows with backups, validation, clear compatibility limits, and safe export only after each supported format has been tested.</p></article>
+      <article class="card"><span class="badge">Implemented foundation</span><h3>RPG Maker MV/MZ codecs</h3><p>Content-based recognition and compression codecs are implemented for MV and MZ. The browser beta exposes selected slot-save fields; MZSEC1 encrypted saves remain unsupported.</p></article>
+      <article class="card"><span class="badge">Experimental beta</span><h3>Field editing and export</h3><p>The in-browser beta edits a limited allowlist of numeric and boolean fields in recognized MV/MZ slot saves. Every game, version and plugin still needs original-game acceptance testing before compatibility can be claimed.</p></article>
     </div>
   </div>
 </section>
@@ -158,7 +159,7 @@ const HOME_HTML = `
   <div class="wrap">
     <h2>Frequently Asked Questions About EditorSaves</h2>
     <div class="prose" style="margin-top: 8px;">
-      <details class="faq-item" open=""><summary>Can I edit a game save on EditorSaves right now?</summary><p>Not yet. The current live release is a save-file collection service for format research. It does not parse save contents for visitors, change money or inventory, or export modified files. Editing features will only be described as available after they are implemented and tested.</p></details>
+      <details class="faq-item" open=""><summary>Can I edit a game save on EditorSaves right now?</summary><p>Yes. An experimental editor beta is available for recognized RPG Maker MV/MZ slot saves. It lets you change selected party, inventory, actor, variable and active-switch values, then download a separate edited copy. Support is not verified for every game or plugin; encrypted MZSEC1 files and unsupported structures cannot be edited.</p></details>
       <details class="faq-item"><summary>Does an accepted file extension mean my game is supported?</summary><p>No. The extension list is an intake filter, not a compatibility guarantee. Different games can use the same extension for different internal formats, and some files need game-specific decompression, decoding, or validation.</p></details>
       <details class="faq-item"><summary>Will uploading a save change or overwrite my original file?</summary><p>No. The website receives an uploaded copy. It does not write to your game folder or modify the original file on your device. Keep your own backup and original copy.</p></details>
       <details class="faq-item"><summary>Do I need an account or payment to contribute?</summary><p>No account or payment is currently required to submit an eligible research sample. The upload flow includes an automated security check and intake validation.</p></details>

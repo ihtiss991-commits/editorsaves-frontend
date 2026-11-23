@@ -1,28 +1,46 @@
 # EditorSaves
 
-> EditorSaves is a game save-file collection and format-research project working toward a future universal game save editor.
+> EditorSaves is a game save-file research project building toward a universal save editor. An experimental browser-based RPG Maker MV/MZ slot-save editor is now available.
 
 ## Current product status
 
-The live website currently provides a save-file submission workflow. It validates the filename extension and file size, verifies an anti-abuse token on the server, calculates a SHA-256 content hash, stores eligible submissions in a private Supabase Storage bucket, and records upload metadata.
+The website provides two separate workflows:
 
-The current release does **not** parse save contents for visitors, modify money or inventory, edit game progress, or export modified save files. An accepted filename extension is an intake rule, not a claim that the format or game is currently editable.
+1. A save-file submission workflow for collecting files and researching formats.
+2. An experimental local editor for recognized RPG Maker MV and MZ slot saves.
+
+The editor identifies save content rather than trusting the filename extension. It supports the current MV LZ-String Base64 codec and MZ zlib/DEFLATE codec. Recognized slot saves expose a limited allowlist of existing values, including party gold and steps, existing item/weapon/armor counts, selected actor stats, non-zero numeric variables, and active switches.
+
+Files are read, parsed, edited, and serialized in a browser worker. The editor does not upload the selected file to EditorSaves, overwrite the original, or change the user's local game folder. It generates a separate edited download.
+
+## Important limitations
+
+- This is an experimental codec and field-editing beta, not universal game compatibility.
+- The editor currently exposes selected fields from recognized RPG Maker MV/MZ slot saves only.
+- Global metadata and configuration saves are recognized but remain read-only.
+- MZSEC1 encrypted saves are identified as unsupported and are not decrypted.
+- Inventory labels use internal database IDs; original game database names are not bundled.
+- Custom plugin editors, per-game field schemas, and broad game/version coverage are not implemented.
+- Synthetic regression tests pass, but original-game load/acceptance tests are still required for each game, version, and plugin combination.
+- A save that parses and reserializes is not automatically proven to load correctly in every game.
+- Users should keep an untouched backup and test edited files on a copy.
 
 ## Main pages
 
-- [Homepage](https://editorsaves.com/): Contribute eligible game save files to format research.
+- [Homepage](https://editorsaves.com/): Project overview and save-file contribution.
+- [Experimental editor](https://editorsaves.com/editor): Local RPG Maker MV/MZ slot-save editor beta.
 - [About](https://editorsaves.com/about): Project mission and research approach.
 - [Contact](https://editorsaves.com/contact): Contact the project.
 - [Privacy Policy](https://editorsaves.com/privacy): Data collection, storage, and retention information.
 - [Terms of Use](https://editorsaves.com/terms): Upload rules and service limitations.
-- [Blog](https://editorsaves.com/blog): Placeholder for future articles; no published articles are currently available.
+- [Blog](https://editorsaves.com/blog): Placeholder for future articles.
 
-## Filename extensions accepted by the current upload intake
+## Filename extensions accepted by the collection intake
 
 .rpgsave, .rmmzsave, .save, .rvdata2, .rvdata, .rxdata, .sav, .dat, .json, .xml, .sqlite, .db, .plr, .wld, .rsv, .sol, .sgs, .qsp, .ksd, .pkl, .pickle, .es3, .lsd.
 
-These extensions are accepted by the current intake filter only. Actual format identification and editor compatibility have not been implemented for the live product. Different games can use the same extension with unrelated internal structures.
+These are intake extensions only. They do not imply that every file with an extension is supported by the editor.
 
 ## Research direction
 
-The project intends to study save-file structure, serialization, compression, encoding, game and version differences, and validation requirements. Future editor support should be reported per game and format with tested limitations rather than inferred from the filename extension.
+The project studies save-file structure, serialization, compression, encoding, game and version differences, and validation requirements. Future support should be documented per game and format with tested limitations rather than inferred from the filename extension.

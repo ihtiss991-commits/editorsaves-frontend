@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import BrandMark from '@/components/BrandMark';
 
 const LINKS = [
+  { href: '/editor', label: 'Editor beta' },
   { href: '/blog', label: 'Blog' },
   { href: '/about', label: 'About' },
 ];

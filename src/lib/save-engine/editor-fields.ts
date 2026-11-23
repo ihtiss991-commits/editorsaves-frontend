@@ -13,7 +13,7 @@ export interface EditorField {
   description: string;
   min?: number;
   max?: number;
-  step?: number;
+  step?: number | "any";
 }
 
 const MAX_FIELDS = 180;
@@ -31,7 +31,7 @@ function addNumberField(
   description: string,
   min = 0,
   max = 2_147_483_647,
-  step = 1
+  step: number | "any" = 1
 ): void {
   if (fields.length >= MAX_FIELDS) return;
   const value = getJsonValueAtPath(root, path);
@@ -179,7 +179,7 @@ export function buildEditableFields(data: JsonValue): EditorField[] {
       addNumberField(
         fields, data, ["variables", "_data", index], "Variables",
         "Variable ID " + index, "A non-zero numeric game variable. Its meaning is defined by the game.",
-        -2_147_483_647, 2_147_483_647, "any" as unknown as number
+        -2_147_483_647, 2_147_483_647, "any"
       );
       shown += 1;
       if (fields.length >= MAX_FIELDS) break;

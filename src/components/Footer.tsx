@@ -19,6 +19,7 @@ export default function Footer() {
           <h2 id="footer-explore" className="site-footer-heading">Explore</h2>
           <div className="site-footer-links">
             <Link href="/">Home</Link>
+            <Link href="/editor">Editor beta</Link>
             <Link href="/blog">Blog</Link>
             <Link href="/about">About</Link>
             <Link href="/contact">Contact</Link>

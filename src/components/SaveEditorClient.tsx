@@ -457,7 +457,7 @@ export default function SaveEditorClient() {
                                   id={"field-" + field.id}
                                   className="save-editor-number"
                                   type="number"
-                                  value={field.value}
+                                  value={typeof field.value === "number" ? field.value : ""}
                                   min={field.min}
                                   max={field.max}
                                   step={field.step === "any" ? "any" : field.step ?? 1}

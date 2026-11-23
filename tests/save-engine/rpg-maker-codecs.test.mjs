@@ -36,7 +36,7 @@ test("RPG Maker MV: LZ-String Base64 round-trip preserves plugin fields", async 
   assert.equal(result.status, "supported");
   assert.equal(result.format, "rpg-maker-mv");
   assert.equal(result.kind, "slot");
-  assert.equal((await parseSaveFile(encoded)).data && JSON.stringify((await parseSaveFile(encoded)).data), JSON.stringify(slotFixture));
+  assert.deepEqual((await parseSaveFile(encoded)).data, slotFixture);
 });
 
 test("RPG Maker MZ: zlib byte-string round-trip preserves plugin fields", async () => {

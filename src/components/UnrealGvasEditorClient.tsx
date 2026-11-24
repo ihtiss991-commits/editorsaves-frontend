@@ -7,6 +7,12 @@ import type {
   UnrealGvasPublicInspection,
   UnrealGvasProperty
 } from "@/lib/unreal-gvas";
+import {
+  detectUnrealGvasGameProfile,
+  getUnrealGvasProfileField,
+  isUnrealGvasProfileFieldEditable,
+  type UnrealGvasGameProfileId
+} from "@/lib/unreal-gvas/game-profiles";
 
 type WorkerReply =
   | { id: number; action: "inspect"; status: "supported"; inspection: UnrealGvasPublicInspection }
@@ -52,7 +58,11 @@ function fieldDescription(property: UnrealGvasProperty): string {
   return "Typed numeric value. The editor retains the original scalar type.";
 }
 
-export default function UnrealGvasEditorClient() {
+interface UnrealGvasEditorClientProps {
+  profileOnly?: UnrealGvasGameProfileId;
+}
+
+export default function UnrealGvasEditorClient({ profileOnly }: UnrealGvasEditorClientProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const workerRef = useRef<Worker | null>(null);
   const requestIdRef = useRef(0);
@@ -89,6 +99,19 @@ export default function UnrealGvasEditorClient() {
     });
   }, [inspection, search, edits]);
 
+  const detectedProfile = inspection
+    ? detectUnrealGvasGameProfile(inspection.header.saveGameClassName)
+    : null;
+  const activeProfile = detectedProfile && (!profileOnly || detectedProfile.id === profileOnly)
+    ? detectedProfile
+    : null;
+  const profileMismatch = Boolean(profileOnly && inspection && !activeProfile);
+  const canEditProperty = (property: UnrealGvasProperty): boolean => {
+    if (!property.editable || profileMismatch) return false;
+    if (activeProfile) return isUnrealGvasProfileFieldEditable(activeProfile, property);
+    return !profileOnly;
+  };
+  const editablePropertyCount = inspection?.properties.filter(canEditProperty).length ?? 0;
   const changedCount = Object.keys(edits).length;
 
   useEffect(() => {
@@ -116,8 +139,11 @@ export default function UnrealGvasEditorClient() {
           if (reply.status === "supported") {
             setInspection(reply.inspection);
             setUnsupportedReason("");
+            const profile = detectUnrealGvasGameProfile(reply.inspection.header.saveGameClassName);
             setNotice(
-              "GVAS properties were parsed locally. Only supported primitive fields can be edited; complex and unknown payloads remain unchanged."
+              profile
+                ? "Half Sword progression save identified. Only the mapped Player Funds field is enabled; nested game data stays read-only."
+                : "GVAS properties were parsed locally. Only supported primitive fields can be edited; complex and unknown payloads remain unchanged."
             );
             setNoticeKind("success");
           } else {
@@ -237,6 +263,7 @@ export default function UnrealGvasEditorClient() {
   };
 
   const setPropertyValue = (property: UnrealGvasProperty, value: EditValue) => {
+    if (!canEditProperty(property)) return;
     setEdits((current) => {
       const next = { ...current };
       if (value === property.value) {
@@ -249,7 +276,7 @@ export default function UnrealGvasEditorClient() {
   };
 
   const downloadEdited = () => {
-    if (!inspection || !workerRef.current || busy || changedCount === 0) return;
+    if (!inspection || !workerRef.current || busy || changedCount === 0 || profileMismatch) return;
     const id = ++requestIdRef.current;
     activeRequestRef.current = id;
     setBusy(true);
@@ -271,11 +298,12 @@ export default function UnrealGvasEditorClient() {
     <main className="unreal-gvas-page">
       <div className="unreal-gvas-shell">
         <header className="unreal-gvas-heading">
-          <div className="unreal-gvas-eyebrow"><span /> Unreal Engine save tool · Experimental beta</div>
-          <h1>Unreal GVAS Save Editor</h1>
+          <div className="unreal-gvas-eyebrow"><span /> {profileOnly === "half-sword" ? "Half Sword game editor · Limited beta" : "Unreal Engine save tool · Experimental beta"}</div>
+          <h1>{profileOnly === "half-sword" ? "Half Sword Save Editor" : "Unreal GVAS Save Editor"}</h1>
           <p>
-            Inspect a raw Unreal Engine GVAS save, search its tagged properties, edit supported
-            scalar values, and download a separate copy. Parsing and editing run locally in your browser.
+            {profileOnly === "half-sword"
+              ? "Edit the mapped Player Funds field in a supported Half Sword progression save. Processing stays local in your browser; nested character and inventory data are preserved read-only."
+              : "Inspect a raw Unreal Engine GVAS save, search its tagged properties, edit supported scalar values, and download a separate copy. Parsing and editing run locally in your browser."}
           </p>
           <div className="unreal-gvas-trust">
             <span><strong>UE4 / UE5</strong> validated header layouts</span>
@@ -355,7 +383,7 @@ export default function UnrealGvasEditorClient() {
                 <span>{inspection.header.propertyLayout === "legacy" ? "Legacy tagged-property layout" : "UE 5.4+ type-tree layout"}</span>
               </div>
               <div><small>Properties</small><strong>{inspection.properties.length}</strong></div>
-              <div><small>Editable</small><strong>{inspection.editablePropertyCount}</strong></div>
+              <div><small>Editable</small><strong>{editablePropertyCount}</strong></div>
               <div><small>File size</small><strong>{formatBytes(inspection.fileSize)}</strong></div>
             </section>
 
@@ -372,13 +400,27 @@ export default function UnrealGvasEditorClient() {
               </span>
             </section>
 
+            {activeProfile && (
+              <section className="unreal-gvas-game-profile">
+                <small>Game-specific profile detected</small>
+                <h2>{activeProfile.gameName} · {activeProfile.saveType}</h2>
+                <p>{activeProfile.description}</p>
+                <p><strong>Enabled field:</strong> {activeProfile.fields.map((field) => field.label).join(", ")}</p>
+                <p>Character attributes such as Weight and Height are nested inside Player Character. They are not edited by this limited profile yet.</p>
+              </section>
+            )}
+            {profileMismatch && (
+              <section className="unreal-gvas-profile-mismatch" role="status">
+                <strong>This file does not match the Half Sword profile.</strong>
+                <span>Upload a save whose exact class is {"/Game/Blueprints/SaveGame/SG_GameProgress.SG_GameProgress_C"} to enable the Half Sword field map. This file remains inspect-only on this page.</span>
+              </section>
+            )}
             <section className="unreal-gvas-warning">
-              <strong>Important: property names are game-defined.</strong>
+              <strong>{activeProfile ? "Half Sword fields are deliberately restricted." : "Important: property names are game-defined."}</strong>
               <span>
-                Unreal does not define standard meanings for fields such as Gold, Level or Inventory.
-                This beta edits typed top-level scalar properties only. Arrays, maps, structs, native data
-                and unknown payloads remain unchanged. A successful rewrite does not guarantee that a game
-                will accept the modified save.
+                {activeProfile
+                  ? "Only the top-level Player Funds IntProperty is enabled for this exact save class. Player Character, inventories, arrays, maps, enums and other nested or unknown payloads remain unchanged and read-only. A structurally verified file is not guaranteed to load in the original game."
+                  : "Unreal does not define standard meanings for fields such as Gold, Level or Inventory. This beta edits typed top-level scalar properties only. Arrays, maps, structs, native data and unknown payloads remain unchanged. A successful rewrite does not guarantee that a game will accept the modified save."}
               </span>
             </section>
 
@@ -386,7 +428,7 @@ export default function UnrealGvasEditorClient() {
               <div>
                 <small>Property explorer</small>
                 <h2>Tagged save properties</h2>
-                <p>Search by property name, type or current value. Complex properties are preserved read-only.</p>
+                <p>{activeProfile ? "Only fields in the verified Half Sword map are editable; all other properties remain read-only." : "Search by property name, type or current value. Complex properties are preserved read-only."}</p>
               </div>
               <div className="unreal-gvas-search-wrap">
                 <input
@@ -404,15 +446,17 @@ export default function UnrealGvasEditorClient() {
                 <div className="unreal-gvas-no-results">No properties match your search.</div>
               ) : visibleProperties.map((property) => {
                 const value = currentValue(property, edits);
+                const editable = canEditProperty(property);
+                const profileField = activeProfile ? getUnrealGvasProfileField(activeProfile, property) : null;
                 return (
-                  <article className={"unreal-gvas-property" + (property.editable ? " is-editable" : " is-readonly")} key={property.index}>
+                  <article className={"unreal-gvas-property" + (editable ? " is-editable" : " is-readonly")} key={property.index}>
                     <div className="unreal-gvas-property-meta">
                       <strong>{property.name}</strong>
                       <span>{property.type} · {property.size} bytes</span>
-                      {property.detail && <small>{property.detail}</small>}
+                      {(profileField?.description || property.detail || (editable ? fieldDescription(property) : "")) && <small>{profileField?.description || property.detail || fieldDescription(property)}</small>}
                     </div>
                     <div className="unreal-gvas-property-control">
-                      {property.editable && property.editKind === "boolean" ? (
+                      {editable && property.editKind === "boolean" ? (
                         <label className="unreal-gvas-toggle">
                           <input
                             type="checkbox"
@@ -422,7 +466,7 @@ export default function UnrealGvasEditorClient() {
                           />
                           <span>{value === true ? "True" : "False"}</span>
                         </label>
-                      ) : property.editable && property.editKind === "text" ? (
+                      ) : editable && property.editKind === "text" ? (
                         <input
                           className="unreal-gvas-value-input is-text"
                           type="text"
@@ -432,7 +476,7 @@ export default function UnrealGvasEditorClient() {
                           onChange={(event) => setPropertyValue(property, event.target.value)}
                           aria-label={"Edit " + property.name}
                         />
-                      ) : property.editable && property.editKind === "number" ? (
+                      ) : editable && property.editKind === "number" ? (
                         <input
                           className="unreal-gvas-value-input"
                           type="number"
@@ -451,7 +495,7 @@ export default function UnrealGvasEditorClient() {
                       ) : (
                         <span className="unreal-gvas-raw-value">{displayValue(value, property.displayValue)}</span>
                       )}
-                      {!property.editable && <small>Read-only</small>}
+                      {!editable && <small>Read-only</small>}
                     </div>
                   </article>
                 );
@@ -476,7 +520,7 @@ export default function UnrealGvasEditorClient() {
                   type="button"
                   className="unreal-gvas-button unreal-gvas-primary"
                   onClick={downloadEdited}
-                  disabled={changedCount === 0 || busy}
+                  disabled={changedCount === 0 || busy || profileMismatch}
                 >
                   {busy ? "Working..." : "Download edited save"} <span aria-hidden="true">↓</span>
                 </button>

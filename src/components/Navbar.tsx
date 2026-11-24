@@ -8,6 +8,7 @@ import BrandMark from '@/components/BrandMark';
 const LINKS = [
   { href: '/editor', label: 'RPG Maker editor' },
   { href: '/editor/unreal', label: 'Unreal GVAS' },
+  { href: '/editor/unreal/half-sword', label: 'Half Sword beta' },
   { href: '/blog', label: 'Blog' },
   { href: '/about', label: 'About' },
 ];

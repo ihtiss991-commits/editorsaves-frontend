@@ -61,7 +61,13 @@ The separate /editor/unreal tool supports raw GVAS files with save-game header v
 
 Editable scalar types are bounded to integer widths, 64-bit integer values (kept as decimal strings), float, double, boolean, and FString string properties. Arrays, maps, sets, structs, enum/name references, object references, native/binary properties and unknown payloads are preserved as raw bytes and shown read-only. Variable-length FString edits update the serialized property size. The rewritten file is reparsed and the edited scalar values are checked before download.
 
-The editor runs in a dedicated browser worker, processes files locally, and keeps the source file unchanged. It does not infer game-specific meanings for property names or provide game-specific schemas. A structurally valid rewrite is not proof that a particular game accepts the save.
+The editor runs in a dedicated browser worker, processes files locally, and keeps the source file unchanged. A structurally valid rewrite is not proof that a particular game accepts the save.
+
+### First game-specific profile: Half Sword
+
+The initial Half Sword profile is keyed by the exact save class `/Game/Blueprints/SaveGame/SG_GameProgress.SG_GameProgress_C`, not by the `.sav` extension or a partial class-name match. It enables only the top-level `Player Funds` field when its type is exactly `IntProperty`. The private research corpus contains seven samples with this exact class and field shape. Public Half Sword modding references independently identify the same `SG_GameProgress_C` class and the Player Funds property.
+
+The `Player Character` struct, nested character attributes, inventories, arrays, maps, enum fields and all other properties remain read-only in this profile. In particular, Weight/Height/Skill-style character fields are not yet supported by the EditorSaves nested-struct parser. The profile is an experimental, single-field mapping and has not passed original-game acceptance testing. Users should back up saves and test edited copies in Half Sword before relying on them.
 
 Header versions other than 2 and 3, custom-version formats other than 3, UE 5.4+ property extension tags, compressed/encrypted wrappers and game-specific container formats are not supported by this beta. The current research archive contains two raw GVAS files with non-2/3 save header versions; these are reported unsupported rather than guessed.
 

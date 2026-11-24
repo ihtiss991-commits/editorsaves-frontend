@@ -247,7 +247,7 @@ export default function SaveEditorClient() {
     if (file) void inspectFile(file);
   };
 
-  const updateField = (field: EditorField, value: number | boolean) => {
+  const updateField = (field: EditorField, value: number | boolean | string) => {
     setWorkingData((current) => {
       if (current === null) return current;
       try {
@@ -450,6 +450,18 @@ export default function SaveEditorClient() {
                                   type="checkbox"
                                   checked={field.value === true}
                                   onChange={(event) => updateField(field, event.target.checked)}
+                                  disabled={busy}
+                                />
+                              ) : field.kind === "text" ? (
+                                <input
+                                  id={"field-" + field.id}
+                                  className="save-editor-number save-editor-text"
+                                  type="text"
+                                  value={typeof field.value === "string" ? field.value : ""}
+                                  maxLength={field.maxLength}
+                                  autoComplete="off"
+                                  spellCheck={false}
+                                  onChange={(event) => updateField(field, event.target.value)}
                                   disabled={busy}
                                 />
                               ) : (

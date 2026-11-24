@@ -123,3 +123,17 @@
   .save-editor-number { width: 92px; }
   .save-editor-summary > div { padding: 14px; }
 }
+
+
+.save-editor-text {
+  width: 180px;
+  max-width: min(42vw, 260px);
+  text-align: left;
+}
+
+@media (max-width: 420px) {
+  .save-editor-text {
+    width: 120px;
+    max-width: 38vw;
+  }
+}

@@ -38,3 +38,18 @@ The synthetic test suite covers MV and MZ round trips, nested plugin fields, glo
 ## Research corpus
 
 The uploaded research archive remains outside the public repository. It is not committed as test data because save files may contain personal identifiers, game progress, or proprietary content. Tests use synthetic examples instead.
+
+
+## Private real-sample validation
+
+The research archive must remain outside GitHub because save data can contain personal progress, identifiers, and proprietary game state. After extracting the archive locally, run:
+
+    npm run validate:real-samples -- path/to/Downloads
+
+Pass the extracted archive folder containing a nested Downloads directory, or pass the Downloads directory itself. The runner reads the dedicated rpgmaker_mv and rpgmaker_mz folders, checks content-based detection, serializes and reparses each recognized file, and compares the complete JSON tree for exact data preservation. It also checks the optional rmmz_encrypted folder to confirm MZSEC1 wrappers are identified as unsupported rather than decoded.
+
+The runner prints aggregate counts only. It does not print source filenames or save contents and does not write to the archive. A successful codec round-trip is not original-game acceptance testing; each game, plugin, and version still needs a load test in its actual game.
+
+## Editor field-map limits
+
+The shared editor schema exposes bounded standard fields only: party gold and steps; actor names, nicknames, levels, experience, HP/MP/TP; a bounded sample of inventory IDs and quantities; and bounded raw variable/switch IDs. Zero-valued numeric variables and both true/false switch states are represented. Raw IDs are deliberately not assigned guessed meanings. Plugin-specific properties remain preserved but read-only until a game-specific schema is validated.

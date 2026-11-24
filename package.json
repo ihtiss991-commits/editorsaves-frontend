@@ -7,7 +7,8 @@
     "build": "npm run test:save-engine && next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test:save-engine": "node --experimental-strip-types --test tests/save-engine/*.test.mjs"
+    "test:save-engine": "node --experimental-strip-types --test tests/save-engine/*.test.mjs",
+    "validate:real-samples": "node --experimental-strip-types scripts/validate-rpg-maker-corpus.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",

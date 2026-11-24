@@ -1,7 +1,7 @@
 import { isJsonRecord } from "./json.ts";
 import type { JsonValue } from "./types.ts";
 
-export type EditorFieldKind = "number" | "boolean";
+export type EditorFieldKind = "number" | "boolean" | "text";
 
 export interface EditorField {
   id: string;
@@ -9,18 +9,19 @@ export interface EditorField {
   section: string;
   label: string;
   kind: EditorFieldKind;
-  value: number | boolean;
+  value: number | boolean | string;
   description: string;
   min?: number;
   max?: number;
   step?: number | "any";
+  maxLength?: number;
 }
 
-const MAX_FIELDS = 180;
-const MAX_INVENTORY_ENTRIES = 50;
-const MAX_ACTORS = 24;
-const MAX_VARIABLES = 40;
-const MAX_SWITCHES = 40;
+const MAX_FIELDS = 220;
+const MAX_INVENTORY_ENTRIES = 20;
+const MAX_ACTORS = 12;
+const MAX_VARIABLES = 20;
+const MAX_SWITCHES = 20;
 
 function addNumberField(
   fields: EditorField[],
@@ -71,6 +72,31 @@ function addBooleanField(
     kind: "boolean",
     value,
     description
+  });
+}
+
+function addTextField(
+  fields: EditorField[],
+  root: JsonValue,
+  path: Array<string | number>,
+  section: string,
+  label: string,
+  description: string,
+  maxLength: number
+): void {
+  if (fields.length >= MAX_FIELDS) return;
+  const value = getJsonValueAtPath(root, path);
+  if (typeof value !== "string") return;
+
+  fields.push({
+    id: JSON.stringify(path),
+    path,
+    section,
+    label,
+    kind: "text",
+    value,
+    description,
+    maxLength
   });
 }
 
@@ -154,6 +180,24 @@ export function buildEditableFields(data: JsonValue): EditorField[] {
       const actorSection = "Actor " + actorId;
       const actorFieldsBefore = fields.length;
 
+      addTextField(
+        fields,
+        data,
+        ["actors", "_data", index, "_name"],
+        actorSection,
+        "Name",
+        "The actor name stored in this save.",
+        80
+      );
+      addTextField(
+        fields,
+        data,
+        ["actors", "_data", index, "_nickname"],
+        actorSection,
+        "Nickname",
+        "The actor nickname stored in this save.",
+        120
+      );
       addNumberField(fields, data, ["actors", "_data", index, "_level"], actorSection, "Level",
         "The stored actor level.", 1, 9999, 1);
       addNumberField(fields, data, ["actors", "_data", index, "_exp"], actorSection, "Experience",
@@ -175,10 +219,10 @@ export function buildEditableFields(data: JsonValue): EditorField[] {
     let shown = 0;
     for (let index = 1; index < variables._data.length && shown < MAX_VARIABLES; index += 1) {
       const value = variables._data[index];
-      if (typeof value !== "number" || !Number.isFinite(value) || value === 0) continue;
+      if (typeof value !== "number" || !Number.isFinite(value)) continue;
       addNumberField(
         fields, data, ["variables", "_data", index], "Variables",
-        "Variable ID " + index, "A non-zero numeric game variable. Its meaning is defined by the game.",
+        "Variable ID " + index, "Raw game variable ID. Its meaning is defined by the game; zero values are included.",
         -2_147_483_647, 2_147_483_647, "any"
       );
       shown += 1;
@@ -190,10 +234,10 @@ export function buildEditableFields(data: JsonValue): EditorField[] {
   if (isJsonRecord(switches) && Array.isArray(switches._data)) {
     let shown = 0;
     for (let index = 1; index < switches._data.length && shown < MAX_SWITCHES; index += 1) {
-      if (switches._data[index] !== true) continue;
+      if (typeof switches._data[index] !== "boolean") continue;
       addBooleanField(
         fields, data, ["switches", "_data", index], "Switches",
-        "Switch ID " + index, "An active game switch. Its meaning is defined by the game."
+        "Switch ID " + index, "Raw game switch ID. Both active and inactive states are shown; its meaning is defined by the game."
       );
       shown += 1;
       if (fields.length >= MAX_FIELDS) break;
@@ -206,7 +250,7 @@ export function buildEditableFields(data: JsonValue): EditorField[] {
 export function setJsonValueAtPath(
   root: JsonValue,
   path: Array<string | number>,
-  nextValue: number | boolean
+  nextValue: number | boolean | string
 ): JsonValue {
   if (path.length === 0) throw new Error("A save field path is required.");
 

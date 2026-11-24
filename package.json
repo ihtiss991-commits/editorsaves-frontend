@@ -8,7 +8,8 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test:save-engine": "node --experimental-strip-types --test tests/save-engine/*.test.mjs",
-    "validate:real-samples": "node --experimental-strip-types scripts/validate-rpg-maker-corpus.mjs"
+    "validate:real-samples": "node --experimental-strip-types scripts/validate-rpg-maker-corpus.mjs",
+    "validate:unreal-gvas": "node --experimental-strip-types scripts/validate-unreal-gvas-corpus.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",

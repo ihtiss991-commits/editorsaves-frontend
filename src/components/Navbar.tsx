@@ -6,7 +6,8 @@ import { useEffect, useState } from 'react';
 import BrandMark from '@/components/BrandMark';
 
 const LINKS = [
-  { href: '/editor', label: 'Editor beta' },
+  { href: '/editor', label: 'RPG Maker editor' },
+  { href: '/editor/unreal', label: 'Unreal GVAS' },
   { href: '/blog', label: 'Blog' },
   { href: '/about', label: 'About' },
 ];
@@ -36,7 +37,7 @@ export default function Navbar() {
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
-  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+  const isActive = (href: string) => pathname === href || (href !== '/editor' && pathname.startsWith(`${href}/`));
 
   return (
     <header className={`site-nav${scrolled ? ' is-scrolled' : ''}${open ? ' is-open' : ''}`}>

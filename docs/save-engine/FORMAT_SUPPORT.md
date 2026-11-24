@@ -53,3 +53,20 @@ The runner prints aggregate counts only. It does not print source filenames or s
 ## Editor field-map limits
 
 The shared editor schema exposes bounded standard fields only: party gold and steps; actor names, nicknames, levels, experience, HP/MP/TP; a bounded sample of inventory IDs and quantities; and bounded raw variable/switch IDs. Zero-valued numeric variables and both true/false switch states are represented. Raw IDs are deliberately not assigned guessed meanings. Plugin-specific properties remain preserved but read-only until a game-specific schema is validated.
+
+
+## Unreal Engine GVAS beta
+
+The separate /editor/unreal tool supports raw GVAS files with save-game header versions 2 and 3. It detects the legacy property-tag layout used before Unreal Engine 5.4 and the UE 5.4+ type-tree property layout. It reads the engine version, package versions, custom-version table, save class, and top-level tagged properties.
+
+Editable scalar types are bounded to integer widths, 64-bit integer values (kept as decimal strings), float, double, boolean, and FString string properties. Arrays, maps, sets, structs, enum/name references, object references, native/binary properties and unknown payloads are preserved as raw bytes and shown read-only. Variable-length FString edits update the serialized property size. The rewritten file is reparsed and the edited scalar values are checked before download.
+
+The editor runs in a dedicated browser worker, processes files locally, and keeps the source file unchanged. It does not infer game-specific meanings for property names or provide game-specific schemas. A structurally valid rewrite is not proof that a particular game accepts the save.
+
+Header versions other than 2 and 3, custom-version formats other than 3, UE 5.4+ property extension tags, compressed/encrypted wrappers and game-specific container formats are not supported by this beta. The current research archive contains two raw GVAS files with non-2/3 save header versions; these are reported unsupported rather than guessed.
+
+To validate against a private extracted research corpus, run:
+
+    npm run validate:unreal-gvas -- path/to/Downloads
+
+The command reads the unreal_gvas directory, checks supported property streams, confirms unchanged output is byte-exact, and tests a copy with one numeric scalar modified and reparsed. It prints aggregate counts only; original saves must not be committed to GitHub. Game acceptance still requires testing in each original game.

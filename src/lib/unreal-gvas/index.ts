@@ -779,15 +779,15 @@ function encodeFString(value: string, encoding: "utf8" | "utf16le"): Uint8Array 
 
 function integerBounds(type: string): { min: bigint; max: bigint } | null {
   switch (type) {
-    case "Int8Property": return { min: -128n, max: 127n };
-    case "UInt8Property": return { min: 0n, max: 255n };
-    case "Int16Property": return { min: -32768n, max: 32767n };
-    case "UInt16Property": return { min: 0n, max: 65535n };
+    case "Int8Property": return { min: BigInt("-128"), max: BigInt("127") };
+    case "UInt8Property": return { min: BigInt("0"), max: BigInt("255") };
+    case "Int16Property": return { min: BigInt("-32768"), max: BigInt("32767") };
+    case "UInt16Property": return { min: BigInt("0"), max: BigInt("65535") };
     case "IntProperty":
-    case "Int32Property": return { min: -2147483648n, max: 2147483647n };
-    case "UInt32Property": return { min: 0n, max: 4294967295n };
-    case "Int64Property": return { min: -9223372036854775808n, max: 9223372036854775807n };
-    case "UInt64Property": return { min: 0n, max: 18446744073709551615n };
+    case "Int32Property": return { min: BigInt("-2147483648"), max: BigInt("2147483647") };
+    case "UInt32Property": return { min: BigInt("0"), max: BigInt("4294967295") };
+    case "Int64Property": return { min: BigInt("-9223372036854775808"), max: BigInt("9223372036854775807") };
+    case "UInt64Property": return { min: BigInt("0"), max: BigInt("18446744073709551615") };
     default: return null;
   }
 }

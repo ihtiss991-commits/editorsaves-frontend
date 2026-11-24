@@ -120,7 +120,7 @@ function legacyFixture() {
     new Uint8Array([1, 2, 3, 4])
   );
 
-  return join(header, properties.subarray(0, properties.length - 0), array, fstring("None"));
+  return join(header, properties, array, fstring("None"), new Uint8Array([0xaa, 0xbb, 0xcc, 0xdd]));
 }
 
 function modernFixture() {
@@ -203,9 +203,9 @@ test("legacy edits preserve the rest of the file and support variable-length FSt
   if (parsed.status !== "supported") return;
 
   const output = serializeUnrealGvas(bytes, parsed.file, [
-    { propertyIndex: parsed.file.properties.find((p) => p.name === "PlayerLevel")!.index, value: 99 },
-    { propertyIndex: parsed.file.properties.find((p) => p.name === "bUnlocked")!.index, value: false },
-    { propertyIndex: parsed.file.properties.find((p) => p.name === "PlayerName")!.index, value: "Longer Hero Name" }
+    { propertyIndex: parsed.file.properties.find((p) => p.name === "PlayerLevel").index, value: 99 },
+    { propertyIndex: parsed.file.properties.find((p) => p.name === "bUnlocked").index, value: false },
+    { propertyIndex: parsed.file.properties.find((p) => p.name === "PlayerName").index, value: "Longer Hero Name" }
   ]);
 
   const reparsed = parseUnrealGvas(output);
@@ -215,7 +215,7 @@ test("legacy edits preserve the rest of the file and support variable-length FSt
   assert.equal(reparsed.file.properties.find((p) => p.name === "PlayerLevel")?.value, 99);
   assert.equal(reparsed.file.properties.find((p) => p.name === "bUnlocked")?.value, false);
   assert.equal(reparsed.file.properties.find((p) => p.name === "PlayerName")?.value, "Longer Hero Name");
-  assert.deepEqual(output.subarray(-4), new Uint8Array([1, 2, 3, 4]).subarray(0, 0)); // no assumption about trailer layout
+  assert.deepEqual(output.subarray(-4), new Uint8Array([0xaa, 0xbb, 0xcc, 0xdd]));
 });
 
 test("UE 5.4+ edits numeric values and boolean tag flags", () => {

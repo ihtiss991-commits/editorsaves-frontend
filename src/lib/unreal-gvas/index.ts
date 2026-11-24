@@ -523,7 +523,7 @@ function decodePropertyValue(
         stringEncoding: null
       };
     }
-    if (size === 1) {
+    if (size === 1 && !modern) {
       const value = bytes[valueOffset] !== 0;
       return {
         value,
@@ -994,7 +994,10 @@ export function serializeUnrealGvas(
 
   for (const edit of edits) {
     const updated = reparsed.file.properties.find((item) => item.index === edit.propertyIndex);
-    if (!updated || updated.value !== edit.value) {
+    const expectedValue = updated?.type === "FloatProperty" && typeof edit.value === "number"
+      ? Math.fround(edit.value)
+      : edit.value;
+    if (!updated || updated.value !== expectedValue) {
       throw new UnrealGvasError("SERIALIZATION_FAILED", "The edited GVAS value did not survive the verification pass.");
     }
   }

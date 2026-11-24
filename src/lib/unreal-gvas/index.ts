@@ -959,7 +959,7 @@ export function serializeUnrealGvas(
 
   patches.sort((a, b) => b.start - a.start);
 
-  let output = original.slice();
+  let output: Uint8Array<ArrayBufferLike> = original.slice();
   for (const patch of patches) {
     if (patch.start < 0 || patch.end < patch.start || patch.end > output.byteLength) {
       throw new UnrealGvasError("INVALID_EDIT", "A GVAS property edit points outside the original file.");

@@ -82,23 +82,6 @@ export default function UnrealGvasEditorClient({ profileOnly }: UnrealGvasEditor
   const [notice, setNotice] = useState("");
   const [noticeKind, setNoticeKind] = useState<"info" | "success" | "error">("info");
 
-  const visibleProperties = useMemo(() => {
-    if (!inspection) return [];
-    const query = search.trim().toLowerCase();
-    if (!query) return inspection.properties;
-
-    return inspection.properties.filter((property) => {
-      const value = currentValue(property, edits);
-      const haystack = [
-        property.name,
-        property.type,
-        property.detail ?? "",
-        value === null ? property.displayValue : String(value)
-      ].join(" ").toLowerCase();
-      return haystack.includes(query);
-    });
-  }, [inspection, search, edits]);
-
   const detectedProfile = inspection
     ? detectUnrealGvasGameProfile(inspection.header.saveGameClassName)
     : null;
@@ -109,9 +92,35 @@ export default function UnrealGvasEditorClient({ profileOnly }: UnrealGvasEditor
   const canEditProperty = (property: UnrealGvasProperty): boolean => {
     if (!property.editable || profileMismatch) return false;
     if (activeProfile) return isUnrealGvasProfileFieldEditable(activeProfile, property);
-    return !profileOnly;
+    // The generic GVAS page keeps nested fields read-only until a game-specific map exists.
+    return !profileOnly && (property.depth ?? 0) === 0;
   };
-  const editablePropertyCount = inspection?.properties.filter(canEditProperty).length ?? 0;
+
+  const visibleProperties = useMemo(() => {
+    if (!inspection) return [];
+    const available = activeProfile
+      ? [...inspection.properties, ...inspection.nestedProperties]
+      : inspection.properties;
+    const query = search.trim().toLowerCase();
+    if (!query) return available;
+
+    return available.filter((property) => {
+      const value = currentValue(property, edits);
+      const haystack = [
+        property.path ?? property.name,
+        property.name,
+        property.type,
+        property.detail ?? "",
+        value === null ? property.displayValue : String(value)
+      ].join(" ").toLowerCase();
+      return haystack.includes(query);
+    });
+  }, [inspection, search, edits, activeProfile]);
+
+  const editablePropertyCount = inspection
+    ? (activeProfile ? [...inspection.properties, ...inspection.nestedProperties] : inspection.properties)
+        .filter(canEditProperty).length
+    : 0;
   const changedCount = Object.keys(edits).length;
 
   useEffect(() => {
@@ -142,7 +151,7 @@ export default function UnrealGvasEditorClient({ profileOnly }: UnrealGvasEditor
             const profile = detectUnrealGvasGameProfile(reply.inspection.header.saveGameClassName);
             setNotice(
               profile
-                ? "Half Sword progression save identified. Only the mapped Player Funds field is enabled; nested game data stays read-only."
+                ? "Half Sword progression save identified. Player Funds, Character Height and Character Weight are mapped; other nested data remains read-only."
                 : "GVAS properties were parsed locally. Only supported primitive fields can be edited; complex and unknown payloads remain unchanged."
             );
             setNoticeKind("success");
@@ -302,7 +311,7 @@ export default function UnrealGvasEditorClient({ profileOnly }: UnrealGvasEditor
           <h1>{profileOnly === "half-sword" ? "Half Sword Save Editor" : "Unreal GVAS Save Editor"}</h1>
           <p>
             {profileOnly === "half-sword"
-              ? "Edit the mapped Player Funds field in a supported Half Sword progression save. Processing stays local in your browser; nested character and inventory data are preserved read-only."
+              ? "Edit Player Funds, Character Height and Character Weight in a supported Half Sword progression save. Other nested character, equipment and inventory data remain read-only; processing stays local in your browser."
               : "Inspect a raw Unreal Engine GVAS save, search its tagged properties, edit supported scalar values, and download a separate copy. Parsing and editing run locally in your browser."}
           </p>
           <div className="unreal-gvas-trust">
@@ -382,7 +391,7 @@ export default function UnrealGvasEditorClient({ profileOnly }: UnrealGvasEditor
                 <strong>{inspection.header.engineVersion}</strong>
                 <span>{inspection.header.propertyLayout === "legacy" ? "Legacy tagged-property layout" : "UE 5.4+ type-tree layout"}</span>
               </div>
-              <div><small>Properties</small><strong>{inspection.properties.length}</strong></div>
+              <div><small>Properties</small><strong>{inspection.properties.length + (activeProfile ? inspection.nestedProperties.length : 0)}</strong></div>
               <div><small>Editable</small><strong>{editablePropertyCount}</strong></div>
               <div><small>File size</small><strong>{formatBytes(inspection.fileSize)}</strong></div>
             </section>
@@ -405,8 +414,8 @@ export default function UnrealGvasEditorClient({ profileOnly }: UnrealGvasEditor
                 <small>Game-specific profile detected</small>
                 <h2>{activeProfile.gameName} · {activeProfile.saveType}</h2>
                 <p>{activeProfile.description}</p>
-                <p><strong>Enabled field:</strong> {activeProfile.fields.map((field) => field.label).join(", ")}</p>
-                <p>Character attributes such as Weight and Height are nested inside Player Character. They are not edited by this limited profile yet.</p>
+                <p><strong>Enabled fields:</strong> {activeProfile.fields.map((field) => field.label).join(", ")}</p>
+                <p>Only these exact paths and serialized types are enabled. Equipment, appearance, inventory and other unverified properties remain read-only.</p>
               </section>
             )}
             {profileMismatch && (
@@ -419,7 +428,7 @@ export default function UnrealGvasEditorClient({ profileOnly }: UnrealGvasEditor
               <strong>{activeProfile ? "Half Sword fields are deliberately restricted." : "Important: property names are game-defined."}</strong>
               <span>
                 {activeProfile
-                  ? "Only the top-level Player Funds IntProperty is enabled for this exact save class. Player Character, inventories, arrays, maps, enums and other nested or unknown payloads remain unchanged and read-only. A structurally verified file is not guaranteed to load in the original game."
+                  ? "Only Player Funds (IntProperty), Character Height (DoubleProperty) and Character Weight (DoubleProperty) at their exact mapped paths are editable. Other nested structs, arrays, maps, enums, equipment, inventory and unknown payloads remain unchanged and read-only. A structurally verified file is not guaranteed to load in the original game."
                   : "Unreal does not define standard meanings for fields such as Gold, Level or Inventory. This beta edits typed top-level scalar properties only. Arrays, maps, structs, native data and unknown payloads remain unchanged. A successful rewrite does not guarantee that a game will accept the modified save."}
               </span>
             </section>
@@ -451,8 +460,8 @@ export default function UnrealGvasEditorClient({ profileOnly }: UnrealGvasEditor
                 return (
                   <article className={"unreal-gvas-property" + (editable ? " is-editable" : " is-readonly")} key={property.index}>
                     <div className="unreal-gvas-property-meta">
-                      <strong>{property.name}</strong>
-                      <span>{property.type} · {property.size} bytes</span>
+                      <strong>{profileField?.label ?? property.name}</strong>
+                      <span>{property.type} · {property.size} bytes{property.depth ? " · Player Character" : ""}</span>
                       {(profileField?.description || property.detail || (editable ? fieldDescription(property) : "")) && <small>{profileField?.description || property.detail || fieldDescription(property)}</small>}
                     </div>
                     <div className="unreal-gvas-property-control">

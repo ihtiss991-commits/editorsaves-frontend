@@ -285,3 +285,81 @@ test("truncated property data fails safely", () => {
   const bytes = modernFixture().subarray(0, 72);
   assert.throws(() => parseUnrealGvas(bytes), UnrealGvasError);
 });
+
+
+function doublePayload(value) {
+  const payload = new Uint8Array(8);
+  new DataView(payload.buffer).setFloat64(0, value, true);
+  return payload;
+}
+
+test("Half Sword passport nested doubles are parsed and edited without resizing the struct", () => {
+  const header = join(
+    encoder.encode("GVAS"),
+    u32(3),
+    u32(522),
+    u32(1012),
+    u16(5), u16(4), u16(4),
+    u32(123456),
+    fstring("++UE5+Release-5.4"),
+    u32(3),
+    u32(0),
+    fstring("/Game/Blueprints/SaveGame/SG_GameProgress.SG_GameProgress_C"),
+    new Uint8Array([0])
+  );
+
+  const heightName = "Height_21_0EB204DF4978B92AD0ED188FD32EEC7B";
+  const weightName = "Weight_23_65E4C6534D14653F96EB739F159E58CD";
+  const passportPayload = join(
+    modernTag(heightName, "DoubleProperty", doublePayload(1.25)),
+    modernTag(weightName, "DoubleProperty", doublePayload(2.5)),
+    modernTag("UnknownCounter", "IntProperty", intPayload(42)),
+    fstring("None")
+  );
+  const passport = modernTag(
+    "Player Character",
+    "StructProperty",
+    passportPayload,
+    {
+      children: [
+        { name: "Str_Passport_Character1", children: [{ name: "/Game/Blueprints/Structure/Passports/Str_Passport_Character1", children: [] }] },
+        { name: "186c699a-4d6a-f0e8-1522-929b3295615b", children: [] }
+      ]
+    }
+  );
+  const funds = modernTag("Player Funds", "IntProperty", intPayload(250));
+  const bytes = join(header, passport, funds, fstring("None"));
+
+  const parsed = parseUnrealGvas(bytes);
+  assert.equal(parsed.status, "supported");
+  if (parsed.status !== "supported") return;
+
+  const height = parsed.file.nestedProperties.find((property) => property.name === heightName);
+  const weight = parsed.file.nestedProperties.find((property) => property.name === weightName);
+  assert.ok(height);
+  assert.ok(weight);
+  assert.equal(height.path, "Player Character." + heightName);
+  assert.equal(height.value, 1.25);
+  assert.equal(weight.value, 2.5);
+  assert.equal(parsed.file.properties.find((property) => property.name === "Player Character")?.editable, false);
+
+  const originalStructSize = parsed.file.properties.find((property) => property.name === "Player Character")?.size;
+  const output = serializeUnrealGvas(bytes, parsed.file, [
+    { propertyIndex: height.index, value: 1.75 },
+    { propertyIndex: weight.index, value: 3.25 }
+  ]);
+  const reparsed = parseUnrealGvas(output);
+  assert.equal(reparsed.status, "supported");
+  if (reparsed.status !== "supported") return;
+
+  assert.equal(reparsed.file.nestedProperties.find((property) => property.name === heightName)?.value, 1.75);
+  assert.equal(reparsed.file.nestedProperties.find((property) => property.name === weightName)?.value, 3.25);
+  assert.equal(
+    reparsed.file.properties.find((property) => property.name === "Player Character")?.size,
+    originalStructSize
+  );
+  assert.equal(
+    reparsed.file.nestedProperties.find((property) => property.name === "UnknownCounter")?.value,
+    42
+  );
+});

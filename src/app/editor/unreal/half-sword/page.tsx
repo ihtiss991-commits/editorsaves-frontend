@@ -5,7 +5,7 @@ import "../editor.css";
 export const metadata: Metadata = {
   title: "Half Sword Save Editor Beta | EditorSaves",
   description:
-    "Experimental local Half Sword progression-save editor. The current game-specific profile maps the Player Funds field and preserves nested save data read-only.",
+    "Experimental local Half Sword progression-save editor for Player Funds, Character Height and Character Weight. Other nested save data is preserved read-only.",
   robots: {
     index: false,
     follow: true

@@ -24,6 +24,8 @@ export interface UnrealGvasProperty {
   editKind: "number" | "boolean" | "text" | null;
   integer: boolean;
   detail: string | null;
+  path?: string;
+  depth?: number;
 }
 
 interface InternalProperty extends UnrealGvasProperty {
@@ -37,6 +39,7 @@ interface InternalProperty extends UnrealGvasProperty {
 export interface ParsedUnrealGvasFile {
   header: UnrealGvasHeader;
   properties: InternalProperty[];
+  nestedProperties: InternalProperty[];
   fileSize: number;
   trailingBytes: number;
   terminatorEndOffset: number;
@@ -50,6 +53,7 @@ export type UnrealGvasParseResult =
 export interface UnrealGvasPublicInspection {
   header: UnrealGvasHeader;
   properties: UnrealGvasProperty[];
+  nestedProperties: UnrealGvasProperty[];
   fileSize: number;
   trailingBytes: number;
   editablePropertyCount: number;
@@ -455,6 +459,55 @@ function parseModernTag(reader: BinaryReader, index: number, name: string): Inte
   };
 }
 
+
+function parseNestedModernPropertyStream(
+  payload: Uint8Array,
+  absoluteOffset: number,
+  parentPath: string,
+  indexStart: number
+): InternalProperty[] {
+  const reader = new BinaryReader(payload.slice());
+  const properties: InternalProperty[] = [];
+
+  for (let index = 0; index < MAX_PROPERTIES; index += 1) {
+    const name = reader.fstring("nested property name").value;
+
+    if (name === "None") {
+      if (reader.offset !== reader.bytes.byteLength) {
+        throw new UnrealGvasError(
+          "INVALID_NESTED_PROPERTY_STREAM",
+          "The nested property stream contains bytes after its terminator."
+        );
+      }
+      return properties;
+    }
+    if (!name) {
+      throw new UnrealGvasError(
+        "INVALID_NESTED_PROPERTY_STREAM",
+        "The nested property stream contains an empty property name."
+      );
+    }
+
+    const property = parseModernTag(reader, indexStart + index, name);
+    property.path = parentPath + "." + name;
+    property.depth = 1;
+
+    // parseModernTag offsets are relative to the bounded struct slice.
+    // Convert them to offsets in the original GVAS file for safe byte-level patching.
+    property.valueOffset += absoluteOffset;
+    property.sizeOffset += absoluteOffset;
+    if (property.flagsOffset !== null) property.flagsOffset += absoluteOffset;
+    if (property.legacyBoolOffset !== null) property.legacyBoolOffset += absoluteOffset;
+
+    properties.push(property);
+  }
+
+  throw new UnrealGvasError(
+    "TOO_MANY_PROPERTIES",
+    "The nested GVAS property stream exceeds the safety limit."
+  );
+}
+
 function numericKind(type: string): {
   bytes: number;
   integer: boolean;
@@ -643,9 +696,11 @@ function readOnlyValue(type: string, size: number, detail: string | null): Decod
 
 function parsePropertyStream(
   reader: BinaryReader,
-  modern: boolean
-): { properties: InternalProperty[]; terminatorEndOffset: number } {
+  modern: boolean,
+  saveGameClassName: string
+): { properties: InternalProperty[]; nestedProperties: InternalProperty[]; terminatorEndOffset: number } {
   const properties: InternalProperty[] = [];
+  const nestedProperties: InternalProperty[] = [];
 
   for (let index = 0; index < MAX_PROPERTIES; index += 1) {
     const name = reader.fstring("property name").value;
@@ -653,6 +708,7 @@ function parsePropertyStream(
     if (name === "None") {
       return {
         properties,
+        nestedProperties,
         terminatorEndOffset: reader.offset
       };
     }
@@ -663,8 +719,31 @@ function parsePropertyStream(
     const property = modern
       ? parseModernTag(reader, index, name)
       : parseLegacyTag(reader, index, name);
-
+    property.path = name;
+    property.depth = 0;
     properties.push(property);
+
+    // Only inspect this exact Half Sword class + property pair. Unknown structs remain opaque.
+    if (
+      modern &&
+      saveGameClassName === "/Game/Blueprints/SaveGame/SG_GameProgress.SG_GameProgress_C" &&
+      property.name === "Player Character" &&
+      property.type === "StructProperty" &&
+      property.size > 0
+    ) {
+      try {
+        const payload = reader.bytes.slice(property.valueOffset, property.valueOffset + property.size);
+        const children = parseNestedModernPropertyStream(
+          payload,
+          property.valueOffset,
+          property.path,
+          MAX_PROPERTIES + nestedProperties.length
+        );
+        nestedProperties.push(...children);
+      } catch {
+        // Keep the parent struct intact and read-only if its nested stream is unfamiliar.
+      }
+    }
   }
 
   throw new UnrealGvasError("TOO_MANY_PROPERTIES", "The GVAS file exceeds the property-count safety limit.");
@@ -691,13 +770,14 @@ export function parseUnrealGvas(input: Uint8Array): UnrealGvasParseResult {
     const reader = new BinaryReader(input);
     const parsedHeader = parseHeader(reader);
     const modern = parsedHeader.header.propertyLayout === "ue5.4+";
-    const parsedStream = parsePropertyStream(reader, modern);
+    const parsedStream = parsePropertyStream(reader, modern, parsedHeader.header.saveGameClassName);
 
     return {
       status: "supported",
       file: {
         header: parsedHeader.header,
         properties: parsedStream.properties,
+        nestedProperties: parsedStream.nestedProperties,
         fileSize: input.byteLength,
         trailingBytes: input.byteLength - parsedStream.terminatorEndOffset,
         terminatorEndOffset: parsedStream.terminatorEndOffset
@@ -723,7 +803,7 @@ export function parseUnrealGvas(input: Uint8Array): UnrealGvasParseResult {
 }
 
 export function toPublicUnrealGvasInspection(file: ParsedUnrealGvasFile): UnrealGvasPublicInspection {
-  const properties: UnrealGvasProperty[] = file.properties.map((property) => ({
+  const toPublicProperty = (property: InternalProperty): UnrealGvasProperty => ({
     index: property.index,
     name: property.name,
     type: property.type,
@@ -733,12 +813,17 @@ export function toPublicUnrealGvasInspection(file: ParsedUnrealGvasFile): Unreal
     editable: property.editable,
     editKind: property.editKind,
     integer: property.integer,
-    detail: property.detail
-  }));
+    detail: property.detail,
+    path: property.path ?? property.name,
+    depth: property.depth ?? 0
+  });
+  const properties: UnrealGvasProperty[] = file.properties.map(toPublicProperty);
+  const nestedProperties: UnrealGvasProperty[] = file.nestedProperties.map(toPublicProperty);
 
   return {
     header: file.header,
     properties,
+    nestedProperties,
     fileSize: file.fileSize,
     trailingBytes: file.trailingBytes,
     editablePropertyCount: properties.filter((property) => property.editable).length
@@ -893,7 +978,8 @@ export function serializeUnrealGvas(
     }
     seen.add(edit.propertyIndex);
 
-    const property = file.properties.find((item) => item.index === edit.propertyIndex);
+    const property = [...file.properties, ...file.nestedProperties]
+      .find((item) => item.index === edit.propertyIndex);
     if (!property || !property.editable || !property.editKind) {
       throw new UnrealGvasError("INVALID_EDIT", "One of the selected GVAS properties is read-only.");
     }
@@ -928,6 +1014,12 @@ export function serializeUnrealGvas(
     }
 
     if (property.type === "StrProperty") {
+      if ((property.depth ?? 0) > 0) {
+        throw new UnrealGvasError(
+          "INVALID_EDIT",
+          "Variable-length strings inside nested structs are read-only until enclosing struct sizes can be rebuilt safely."
+        );
+      }
       if (typeof edit.value !== "string" || property.stringEncoding === null) {
         throw new UnrealGvasError("INVALID_EDIT", "String GVAS properties require text values.");
       }
@@ -993,7 +1085,8 @@ export function serializeUnrealGvas(
   }
 
   for (const edit of edits) {
-    const updated = reparsed.file.properties.find((item) => item.index === edit.propertyIndex);
+    const updated = [...reparsed.file.properties, ...reparsed.file.nestedProperties]
+      .find((item) => item.index === edit.propertyIndex);
     const expectedValue = updated?.type === "FloatProperty" && typeof edit.value === "number"
       ? Math.fround(edit.value)
       : edit.value;
